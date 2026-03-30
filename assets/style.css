@@ -1,4 +1,4 @@
-/* --- GLOBAL --- */
+/* --- RESET & BASE --- */
 * {
   margin: 0;
   padding: 0;
@@ -6,156 +6,106 @@
 }
 
 body {
-  background-color: #82C4C3; /* The teal background */
-  /* This automatically pulls the cleanest sans-serif font on your computer (like Apple SD Gothic Neo) */
-  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  background-color: #ffffff; /* Pure white background */
+  color: #000000;
+  /* Clean, modern Apple-style font stack */
+  font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centers the name vertically */
+  align-items: center;
+  overflow: hidden; /* Keeps everything clean and static */
+}
+
+/* --- CENTER TEXT --- */
+.center-content {
+  text-align: center;
+  /* Pulls it slightly up from true center to balance the bottom icons */
+  transform: translateY(-20px); 
+}
+
+.brand-name {
+  font-size: 22px; /* Small, minimal text */
+  font-weight: 400; /* Not bold */
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.location-tag {
+  font-size: 13px; /* Smaller than the name */
+  color: #888888; /* Subtle grey */
+  font-weight: 300;
+}
+
+/* --- GRAVITY SHELF (The Bottom Stack) --- */
+.gravity-shelf {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding-bottom: 30px; /* Sits right near the bottom edge */
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 40px;
+  align-items: flex-end; /* Sits them flat on the bottom */
+  gap: 25px; /* Space between icons */
+  flex-wrap: wrap; 
 }
 
-/* --- THE MAIN BOX (Canvas) --- */
-.canvas-box {
-  background-color: #FFFDE8; /* Warm paper color */
-  width: 100%;
-  max-width: 1000px;
-  height: 80vh; /* Makes the box nice and tall */
-  min-height: 600px;
-  border-radius: 12px;
+.icon-item {
   position: relative;
-  overflow: hidden; /* Keeps floating items inside the box */
-  
-  /* REMOVED: All borders and shadows as requested! */
-}
-
-/* --- TEXT STYLING --- */
-.main-name {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); /* Perfectly centers the text */
-  font-size: 80px;
-  font-weight: 800; /* Bold */
-  color: #000000; /* Black */
-  letter-spacing: 6px;
-  z-index: 10;
-}
-
-.subtitle {
-  position: absolute;
-  bottom: 30px;
-  right: 40px;
-  font-size: 16px;
-  font-style: italic; /* Italic */
-  font-weight: 400; /* Not bold */
-  color: #333333;
-}
-
-/* --- FLOATING ICONS --- */
-.floating-icons-container {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  pointer-events: none; /* Lets you click 'through' the invisible container */
-}
-
-.floating-item {
-  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
-  pointer-events: auto; /* Makes the specific icons hoverable/clickable */
-  z-index: 20;
-}
-
-/* The actual emoji */
-.emoji {
-  font-size: 70px; /* Much bigger! */
   cursor: pointer;
-  transition: transform 0.2s ease;
-  filter: drop-shadow(0px 10px 10px rgba(0,0,0,0.1)); /* Soft shadow just on the emoji itself */
 }
 
-/* The hover text box (hidden by default) */
-.hover-text {
+.emoji {
+  font-size: 45px; /* Clean, uniform size */
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+/* --- THE POPOVER TEXT --- */
+.popover {
+  position: absolute;
+  bottom: 100%; /* Shows ABOVE the icon */
+  margin-bottom: 15px;
+  background: #000000; /* Crisp black tooltip */
+  color: #ffffff;
+  padding: 10px 16px;
+  font-size: 13px;
+  border-radius: 8px;
+  white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  position: absolute;
-  top: 100%; /* Positions it directly below the emoji */
-  margin-top: 10px;
-  background-color: rgba(255, 255, 255, 0.95);
-  padding: 12px 18px;
-  border-radius: 8px;
-  color: #000;
-  font-size: 16px;
-  font-weight: 500;
-  text-align: center;
-  white-space: nowrap; /* Keeps text on one line */
-  box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
   transition: all 0.2s ease;
-  transform: translateY(-10px); /* Starts slightly high for a fade-down effect */
+  transform: translateY(10px);
+  z-index: 100;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.1); /* Soft shadow for depth */
 }
 
-/* Hover Interaction */
-.floating-item:hover .emoji {
-  transform: scale(1.15); /* Emoji grows slightly when hovered */
+/* Interaction */
+.icon-item:hover .emoji {
+  transform: scale(1.15) translateY(-5px); /* Gentle pop-up effect */
 }
-.floating-item:hover .hover-text {
+
+.icon-item:hover .popover {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0px); /* Drops into place */
+  transform: translateY(0); /* Glides into place */
 }
 
-/* --- BUTTONS INSIDE HOVER TEXT --- */
-.action-btn {
-  display: inline-block;
-  margin-top: 8px;
-  padding: 6px 16px;
-  background-color: #000;
-  color: #FFF;
+/* --- BUTTONS INSIDE POPOVER --- */
+.mini-btn {
+  color: #ffffff;
+  background-color: #333333; /* Dark grey button */
   text-decoration: none;
-  border-radius: 20px;
-  font-size: 14px;
+  font-weight: bold;
+  margin-left: 8px;
+  padding: 4px 10px;
+  border-radius: 12px;
   transition: background-color 0.2s;
 }
 
-.action-btn:hover {
-  background-color: #D94841; /* Turns red when hovered */
-}
-
-/* --- POSITIONING AND ANIMATION FOR EACH ICON --- */
-/* The animation keyframes make them bob up and down */
-@keyframes floatBob {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
-  100% { transform: translateY(0px); }
-}
-
-/* Placing them around the screen and giving them different animation timing so they don't sync up */
-.food {
-  top: 20%;
-  left: 15%;
-  animation: floatBob 4s ease-in-out infinite;
-}
-
-.song {
-  top: 25%;
-  right: 18%;
-  animation: floatBob 5s ease-in-out infinite 1s; /* 1s delay */
-}
-
-.website {
-  bottom: 25%;
-  left: 20%;
-  animation: floatBob 4.5s ease-in-out infinite 0.5s;
-}
-
-.ascii {
-  bottom: 25%;
-  right: 25%;
-  animation: floatBob 6s ease-in-out infinite 2s;
+.mini-btn:hover {
+  background-color: #D94841; /* Pops red when hovered */
 }
