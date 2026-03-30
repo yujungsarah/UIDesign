@@ -20,7 +20,7 @@ body {
 /* --- CENTER TEXT --- */
 .center-content {
   text-align: center;
-  transform: translateY(-40px); /* Pulled up a bit more to make room for the big pile */
+  transform: translateY(-60px); /* Pulled up even higher to make room for giant emojis */
 }
 
 .brand-name {
@@ -42,11 +42,19 @@ body {
   bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
-  width: 380px; /* A narrow box forces the icons to stack */
+  width: 480px; /* Widened to fit the bigger emojis */
   display: flex;
-  flex-wrap: wrap-reverse; /* Builds the pile from the bottom up */
+  flex-wrap: wrap-reverse;
   justify-content: center;
   align-items: center;
+}
+
+/* --- THE FALLING ANIMATION --- */
+@keyframes dropIn {
+  0% { transform: translateY(-120vh); opacity: 0; }
+  70% { transform: translateY(15px); opacity: 1; } /* Drops past the floor slightly */
+  85% { transform: translateY(-5px); } /* Bounces back up */
+  100% { transform: translateY(0); } /* Settles into place */
 }
 
 .icon-item {
@@ -54,25 +62,34 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: -15px -10px; /* OVERLAP! This is what creates the "pile" look */
+  margin: -25px -15px; /* Deeper negative margins for more overlap */
   cursor: pointer;
-  z-index: 1; /* Base level */
+  z-index: 1;
+  /* Apply the falling animation by default */
+  animation: dropIn 0.8s cubic-bezier(0.25, 1, 0.5, 1) backwards;
 }
 
-/* When you hover an icon, it jumps to the very front of the pile */
+/* Staggering the drop times so they fall in a random-looking order */
+.icon-item:nth-child(1) { animation-delay: 0.1s; }
+.icon-item:nth-child(2) { animation-delay: 0.4s; }
+.icon-item:nth-child(3) { animation-delay: 0.0s; } /* This one falls first */
+.icon-item:nth-child(4) { animation-delay: 0.5s; }
+.icon-item:nth-child(5) { animation-delay: 0.2s; }
+.icon-item:nth-child(6) { animation-delay: 0.6s; }
+.icon-item:nth-child(7) { animation-delay: 0.3s; }
+
 .icon-item:hover {
-  z-index: 50; 
+  z-index: 50; /* Brings the hovered item to the very front */
 }
 
 .emoji {
-  font-size: 80px; /* MUCH BIGGER */
+  font-size: 110px; /* MASSIVE EMOJIS! */
   display: inline-block;
   transition: all 0.2s cubic-bezier(0.2, 0, 0.2, 1);
-  /* A slight drop shadow separates them from each other in the pile */
-  filter: drop-shadow(0px 8px 12px rgba(0,0,0,0.15)); 
+  filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.15)); /* Stronger shadow for bigger icons */
 }
 
-/* Giving each icon a slight random rotation so it looks dropped */
+/* Giving each icon a static rotation so the pile looks messy */
 .icon-item:nth-child(1) .emoji { transform: rotate(-15deg); }
 .icon-item:nth-child(2) .emoji { transform: rotate(10deg); }
 .icon-item:nth-child(3) .emoji { transform: rotate(-25deg); }
@@ -85,7 +102,7 @@ body {
 /* --- THE POPOVER TEXT --- */
 .popover {
   position: absolute;
-  bottom: 80%; /* Adjusted to pop up nicely above the larger icons */
+  bottom: 85%; /* Adjusted to clear the giant emojis */
   background: #000000;
   color: #ffffff;
   padding: 10px 16px;
@@ -98,23 +115,22 @@ body {
   transform: translateY(10px);
   z-index: 100;
   box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
-  pointer-events: none; /* Prevents the tooltip from glitching the hover state */
+  pointer-events: none;
 }
 
-/* Let links inside the popover be clickable */
 .popover a {
-  pointer-events: auto; 
+  pointer-events: auto;
 }
 
-/* Hover Interaction: Scales up and straightens out */
+/* Hover Interaction: Overrides the static rotation and pops it up */
 .icon-item:hover .emoji {
-  transform: scale(1.15) translateY(-15px) rotate(0deg) !important; 
+  transform: scale(1.15) translateY(-20px) rotate(0deg) !important; 
 }
 
 .icon-item:hover .popover {
   opacity: 1;
   visibility: visible;
-  transform: translateY(-20px);
+  transform: translateY(-25px);
 }
 
 /* --- BUTTONS INSIDE POPOVER --- */
