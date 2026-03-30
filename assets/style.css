@@ -6,49 +6,47 @@
 }
 
 body {
-  background-color: #ffffff; /* Pure white background */
+  background-color: #ffffff;
   color: #000000;
-  /* Clean, modern Apple-style font stack */
   font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Centers the name vertically */
+  justify-content: center;
   align-items: center;
-  overflow: hidden; /* Keeps everything clean and static */
+  overflow: hidden;
 }
 
 /* --- CENTER TEXT --- */
 .center-content {
   text-align: center;
-  /* Pulls it slightly up from true center to balance the bottom icons */
-  transform: translateY(-20px); 
+  transform: translateY(-40px); /* Pulled up a bit more to make room for the big pile */
 }
 
 .brand-name {
-  font-size: 22px; /* Small, minimal text */
-  font-weight: 400; /* Not bold */
+  font-size: 22px;
+  font-weight: 400;
   letter-spacing: 1px;
   margin-bottom: 6px;
 }
 
 .location-tag {
-  font-size: 13px; /* Smaller than the name */
-  color: #888888; /* Subtle grey */
+  font-size: 13px;
+  color: #888888;
   font-weight: 300;
 }
 
-/* --- GRAVITY SHELF (The Bottom Stack) --- */
+/* --- THE GRAVITY PILE --- */
 .gravity-shelf {
   position: absolute;
-  bottom: 0;
-  width: 100%;
-  padding-bottom: 30px; /* Sits right near the bottom edge */
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 380px; /* A narrow box forces the icons to stack */
   display: flex;
+  flex-wrap: wrap-reverse; /* Builds the pile from the bottom up */
   justify-content: center;
-  align-items: flex-end; /* Sits them flat on the bottom */
-  gap: 25px; /* Space between icons */
-  flex-wrap: wrap; 
+  align-items: center;
 }
 
 .icon-item {
@@ -56,20 +54,39 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: -15px -10px; /* OVERLAP! This is what creates the "pile" look */
   cursor: pointer;
+  z-index: 1; /* Base level */
+}
+
+/* When you hover an icon, it jumps to the very front of the pile */
+.icon-item:hover {
+  z-index: 50; 
 }
 
 .emoji {
-  font-size: 45px; /* Clean, uniform size */
-  transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1);
+  font-size: 80px; /* MUCH BIGGER */
+  display: inline-block;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0.2, 1);
+  /* A slight drop shadow separates them from each other in the pile */
+  filter: drop-shadow(0px 8px 12px rgba(0,0,0,0.15)); 
 }
+
+/* Giving each icon a slight random rotation so it looks dropped */
+.icon-item:nth-child(1) .emoji { transform: rotate(-15deg); }
+.icon-item:nth-child(2) .emoji { transform: rotate(10deg); }
+.icon-item:nth-child(3) .emoji { transform: rotate(-25deg); }
+.icon-item:nth-child(4) .emoji { transform: rotate(18deg); }
+.icon-item:nth-child(5) .emoji { transform: rotate(-8deg); }
+.icon-item:nth-child(6) .emoji { transform: rotate(22deg); }
+.icon-item:nth-child(7) .emoji { transform: rotate(-12deg); }
+
 
 /* --- THE POPOVER TEXT --- */
 .popover {
   position: absolute;
-  bottom: 100%; /* Shows ABOVE the icon */
-  margin-bottom: 15px;
-  background: #000000; /* Crisp black tooltip */
+  bottom: 80%; /* Adjusted to pop up nicely above the larger icons */
+  background: #000000;
   color: #ffffff;
   padding: 10px 16px;
   font-size: 13px;
@@ -80,24 +97,30 @@ body {
   transition: all 0.2s ease;
   transform: translateY(10px);
   z-index: 100;
-  box-shadow: 0px 4px 12px rgba(0,0,0,0.1); /* Soft shadow for depth */
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+  pointer-events: none; /* Prevents the tooltip from glitching the hover state */
 }
 
-/* Interaction */
+/* Let links inside the popover be clickable */
+.popover a {
+  pointer-events: auto; 
+}
+
+/* Hover Interaction: Scales up and straightens out */
 .icon-item:hover .emoji {
-  transform: scale(1.15) translateY(-5px); /* Gentle pop-up effect */
+  transform: scale(1.15) translateY(-15px) rotate(0deg) !important; 
 }
 
 .icon-item:hover .popover {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0); /* Glides into place */
+  transform: translateY(-20px);
 }
 
 /* --- BUTTONS INSIDE POPOVER --- */
 .mini-btn {
   color: #ffffff;
-  background-color: #333333; /* Dark grey button */
+  background-color: #333333;
   text-decoration: none;
   font-weight: bold;
   margin-left: 8px;
@@ -107,5 +130,5 @@ body {
 }
 
 .mini-btn:hover {
-  background-color: #D94841; /* Pops red when hovered */
+  background-color: #D94841;
 }
