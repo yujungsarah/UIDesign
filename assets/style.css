@@ -6,10 +6,8 @@
 }
 
 body {
-  /* A warm, kraft-paper beige */
-  background-color: #E6DACA; 
-  /* 'Syne' gives it that modern, editorial art-gallery feel */
-  font-family: 'Syne', sans-serif; 
+  background-color: #FDF9F1; /* Brighter, cleaner off-white so colors pop */
+  font-family: 'Fredoka', sans-serif; /* Modern, clean, rounded body text */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -33,21 +31,19 @@ body {
 }
 
 .groovy-title {
-  font-family: 'Shrikhand', cursive;
-  font-size: 80px;
-  letter-spacing: 2px;
+  font-family: 'Titan One', cursive; /* The goofy, chunky sans-serif! */
+  font-size: 85px; /* Made it slightly larger because this font is squatter */
+  letter-spacing: 4px;
   line-height: 1.1;
-  /* Adds a subtle paper-cutout shadow */
-  text-shadow: 3px 3px 0px rgba(0,0,0,0.1); 
+  text-shadow: 4px 4px 0px rgba(0,0,0,0.08); /* Sharper, cleaner shadow */
 }
 
-/* Multi-colored letters pulled from your inspo image */
-.color-pink { color: #C25B9A; }
-.color-brown { color: #6D4124; }
-.color-yellow { color: #D2BA5E; }
-.color-green { color: #67714A; }
-.color-red { color: #C73629; }
-.color-blue { color: #2B4E9C; }
+.color-pink { color: #FF2A85; }
+.color-brown { color: #8A4300; } /* Rich, punchy dark orange/brown */
+.color-yellow { color: #FFCC00; }
+.color-green { color: #00D26A; } /* Bright minty green */
+.color-red { color: #FF3B30; }   /* Pure vivid red */
+.color-blue { color: #0055FF; }  /* Electric blue */
 
 .subtitle {
   font-family: 'Courier New', Courier, monospace; /* Typewriter accent */
@@ -57,11 +53,12 @@ body {
 }
 
 .section-title {
-  font-family: 'Shrikhand', cursive;
+  font-family: 'Titan One', cursive;
   font-size: 32px;
-  color: #C73629;
+  color: #FF3B30; /* Vivid red */
   margin-bottom: 20px;
   padding-left: 20px;
+  letter-spacing: 2px;
 }
 
 /* --- LISTS & ALIGNMENT --- */
@@ -102,10 +99,10 @@ body {
 }
 
 /* Different blob background colors */
-.bg-red { background-color: #C73629; }
-.bg-yellow { background-color: #D2BA5E; }
-.bg-blue { background-color: #2B4E9C; }
-.bg-green { background-color: #67714A; }
+.bg-red { background-color: #FF3B30; }
+.bg-yellow { background-color: #FFCC00; }
+.bg-blue { background-color: #0055FF; }
+.bg-green { background-color: #00D26A; }
 
 /* These border-radius percentages are what create the irregular shapes!
   They define horizontal and vertical curves independently.
@@ -122,22 +119,22 @@ body {
 
 .cutout-btn {
   background-color: #FFF;
-  color: #C73629;
+  color: #FF3B30;
   text-decoration: none;
   padding: 10px 24px;
-  font-weight: 800;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
   font-size: 16px;
-  /* Making the button an organic shape too! */
   border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-  border: 2px solid #C73629;
+  border: 3px solid #FF3B30; /* Thicker, bolder border */
   margin-left: 10px;
   transition: all 0.2s ease;
 }
 
 .cutout-btn:hover {
-  background-color: #C73629;
+  background-color: #FF3B30;
   color: #FFF;
-  transform: scale(1.05) rotate(-2deg);
+  transform: scale(1.05) rotate(-3deg);
 }
 
 .exercise-link {
