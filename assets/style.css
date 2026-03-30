@@ -1,60 +1,145 @@
+/* --- 1. GLOBAL RESET --- */
+/* This removes default browser spacing so we start with a clean slate */
 * {
-	margin:  0px;
-	padding:  0px;
-	box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* adjusting fonts */
-
+/* --- 2. BACKGROUND & BODY --- */
 body {
-	font-family: -apple-system, BlinkMacSystemFont, helvetica, arial, sans-serif;
-	transition: background 500ms ease;
+  /* A nice retro teal/blue for the outer background */
+  background-color: #82C4C3; 
+  /* Using the Space Grotesk font we imported in the HTML */
+  font-family: 'Space Grotesk', Helvetica, Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Makes sure the background covers the whole screen */
+  padding: 20px;
 }
 
-p, li {
-	font-size:  22px;
-	line-height: 30px;
+/* --- 3. THE MAIN CARD (The "Scrapbook Page") --- */
+.scrapbook-container {
+  background-color: #FFF9D2; /* Pale yellow from your 1st image */
+  max-width: 600px;
+  width: 100%;
+  padding: 50px 40px;
+  border-radius: 20px;
+  position: relative; /* This allows us to absolute-position the stickers inside */
+  /* A bold, retro drop shadow */
+  box-shadow: 8px 8px 0px #222;
+  border: 3px solid #222;
 }
 
-/* adjusting spacing */
-
-#left-column {
-	padding: 20px;
+/* --- 4. TYPOGRAPHY (Fonts and Text) --- */
+.header-section {
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-h1, p {
-	margin-bottom:  20px;
+.main-title {
+  /* Using the groovy serif font we imported */
+  font-family: 'DM Serif Display', serif;
+  font-size: 52px;
+  color: #111;
+  letter-spacing: 2px;
 }
 
-ul, ol {
-	margin-left: 20px;
+.subtitle {
+  font-size: 18px;
+  color: #555;
+  font-style: italic;
+  margin-top: -5px;
 }
 
-img {
-	max-width: 100%;
-	height:  auto;
+.section-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: #D94841; /* A pop of retro red */
 }
 
-/* uncomment the code below to set the grid */
-
-/*#grid {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
+/* --- 5. LISTS --- */
+.info-list {
+  list-style: none; /* Removes default bullet points */
+  margin-bottom: 30px;
 }
 
-body {
-	overflow: hidden;
+.info-list li {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #222;
+  display: flex; /* Aligns items neatly in a row */
+  align-items: center;
 }
 
-.scroll {
-	padding:  20px;
-	overflow: scroll;
-	height: 100vh;
+.emoji {
+  font-size: 24px;
+  margin-right: 15px;
 }
 
-#left-column {
+/* --- 6. BUTTONS & LINKS --- */
+.website-item {
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
-#right-column {
-	background: #333;
-}*/
+.retro-btn {
+  background-color: #D94841; /* Red */
+  color: white;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 14px;
+  border: 2px solid #222;
+  box-shadow: 3px 3px 0px #222;
+  transition: all 0.1s ease;
+}
+
+/* Make the button move when hovered/clicked */
+.retro-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px #222;
+}
+.retro-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #222;
+}
+
+.exercise-link {
+  color: #2B5C92;
+  text-decoration: none;
+  font-weight: bold;
+  border-bottom: 2px dashed #2B5C92;
+}
+.exercise-link:hover {
+  color: #D94841;
+  border-bottom-color: #D94841;
+}
+
+/* --- 7. FLOATING STICKERS --- */
+.sticker {
+  position: absolute;
+  font-size: 40px;
+  user-select: none;
+  z-index: 10;
+}
+
+/* Positioning each sticker randomly on the edges */
+.sticker-1 {
+  top: -20px;
+  right: -10px;
+  transform: rotate(15deg);
+}
+.sticker-2 {
+  top: 40px;
+  left: -25px;
+  transform: rotate(-10deg);
+}
+.sticker-3 {
+  bottom: 20px;
+  right: 20px;
+  transform: rotate(25deg);
+}
