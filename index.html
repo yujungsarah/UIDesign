@@ -4,14 +4,20 @@
   <meta charset="utf-8">
   <title>Yujung Kim | UI Design</title>
   <link rel="stylesheet" href="assets/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Titan+One&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Lato:ital,wght@0,300;0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="collage-outer">
+  
+  <div class="cloud-1 collage-deco"></div>
+  <div class="star-deco-top collage-deco"></div>
+  <div class="lion-deco-bottom collage-deco"></div>
 
-  <div class="poster-container">
+  <div class="main-content-page">
     
     <header class="header-section">
-      <h1 class="groovy-title">
+      <h1 class="groovy-title multi-color-title">
         <span class="color-pink">Y</span>
         <span class="color-brown">u</span>
         <span class="color-yellow">j</span>
@@ -22,35 +28,35 @@
       <p class="subtitle">yaaaaaaaaaayyy</p>
     </header>
 
-    <div class="content-grid">
+    <ul class="floating-favourites-list">
       
-      <ul class="info-list">
-        <li>
-          <div class="blob shape-1 bg-red"><span class="emoji">🍣</span></div>
-          <span class="text">My favorite food is sushi</span>
-        </li>
-        <li>
-          <div class="blob shape-2 bg-yellow"><span class="emoji">🎵</span></div>
-          <span class="text">My favorite song is Sincerity is Scary</span>
-        </li>
-        <li class="website-item">
-          <div class="blob shape-3 bg-blue"><span class="emoji">🕹️</span></div>
-          <span class="text">My favorite website is Tetrio</span>
+      <li class="floating-fav-item fav-food">
+        <span class="emoji-container red">🍣</span>
+        <span class="reveal-content-text">My favorite food is sushi</span>
+      </li>
+
+      <li class="floating-fav-item fav-song">
+        <span class="emoji-container yellow">🎵</span>
+        <span class="reveal-content-text">My favorite song is Sincerity is Scary</span>
+      </li>
+
+      <li class="floating-fav-item fav-website">
+        <span class="emoji-container blue">🕹️</span>
+        <span class="reveal-content-wrapper">
+          <span class="reveal-content-text">My favorite website is Tetrio</span>
           <a href="https://tetr.io" class="cutout-btn">Play Tetrio!</a>
-        </li>
+        </span>
+      </li>
+
+    </ul>
+
+    <div class="exercises-area">
+      <h3 class="exercises-title">Exercises</h3>
+      <ul class="exercises-list">
+        <li>👉 <a href="ascii_town/ascii_town_exterior.html" class="inline-link-blue">ASCII Town</a></li>
       </ul>
-
-      <div class="exercises-section">
-        <h3 class="section-title">Exercises</h3>
-        <ul class="info-list">
-          <li>
-            <div class="blob shape-4 bg-green"><span class="emoji">✏️</span></div>
-            <a href="ascii_town/ascii_town_exterior.html" class="exercise-link">ASCII Town</a>
-          </li>
-        </ul>
-      </div>
-
     </div>
+
   </div>
 
 </body>

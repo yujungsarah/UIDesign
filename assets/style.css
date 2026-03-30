@@ -1,152 +1,269 @@
-/* --- GLOBAL --- */
+/* ========================================= */
+/* --- GENERAL RESET --- */
+/* ========================================= */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  background-color: #FDF9F1; /* Brighter, cleaner off-white so colors pop */
-  font-family: 'Fredoka', sans-serif; /* Modern, clean, rounded body text */
+/* ========================================= */
+/* --- COLORS & FONTS from image_8.png --- */
+/* ========================================= */
+:root {
+  /* Warm Paper Colors from image_8.png */
+  --bg-color-outer: #82C4C3;     /* Grey-blue cloud field (from image_9.png and original background) */
+  --bg-color-page: #FFFDE8;      /* Warm beige paper page */
+  --color-border-cutout: #D94841; /* Hand-drawn button outline color */
+  --color-exercises-title: #D94841; /* Exercises title color */
+  --color-inline-link: #2B5C92;   /* Standard inline link blue */
+  --color-tetrio-btn: #333333;   /* Tetrio button bg */
+  
+  /* Multi-color shadow layers from image_8.png name */
+  --shadow-pink:   #C25B9A;
+  --shadow-brown:  #6D4124;
+  --shadow-yellow: #D2BA5E;
+  --shadow-green:  #67714A;
+  --shadow-red:    #C73629;
+  --shadow-blue:   #2B4E9C;
+
+  /* Fonts from image_8.png style */
+  --font-serif: 'DM Serif Display', serif;
+  --font-sans: 'Lato', sans-serif;
+}
+
+/* ========================================= */
+/* --- PAGE LAYOUT & DECORATION --- */
+/* ========================================= */
+body.collage-outer {
+  background-color: var(--bg-color-outer);
+  font-family: var(--font-sans);
+  color: #1A1A1A;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   padding: 40px;
-  color: #1A1A1A;
+  overflow: hidden; /* Prevent page scrolling so elements look like they float on the void */
+  position: relative;
 }
 
-.poster-container {
-  max-width: 700px;
+/* Base style for decoration elements on the void background */
+.collage-deco {
+  position: absolute;
+  pointer-events: none; /* Let clicks pass through to content */
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+
+/* Decorative elements positions around the page */
+.cloud-1 { top: 100px; left: 50px; width: 100px; height: 100px; background-image: url('assets/cloud.svg'); opacity: 0.3; }
+.star-deco-top { top: 30px; right: 50px; width: 50px; height: 50px; background-image: url('assets/star.svg'); opacity: 0.3; }
+.lion-deco-bottom { bottom: 50px; left: 100px; width: 150px; height: 150px; background-image: url('assets/lion.svg'); opacity: 0.15; }
+
+/* The main cut-out page area */
+.main-content-page {
+  background-color: var(--bg-color-page);
+  padding: 60px;
+  position: relative;
+  z-index: 10;
+  max-width: 800px;
   width: 100%;
-  /* We remove the background block so it looks like a printed poster */
-  display: flex;
-  flex-direction: column;
-  gap: 60px;
-}
-
-/* --- TYPOGRAPHY (The GROOVY look) --- */
-.header-section {
   text-align: center;
+  
+  /* Irregular, paper cutout shape for the whole page */
+  border-radius: 20px 20px 20px 10px / 10px 10px 20px 20px;
+  border: 4px solid var(--shadow-brown); /* A thin, paper-edge color */
+  box-shadow: 10px 10px 0px rgba(0,0,0,0.1); /* Paper shadow */
 }
 
-.groovy-title {
-  font-family: 'Titan One', cursive; /* The goofy, chunky sans-serif! */
-  font-size: 85px; /* Made it slightly larger because this font is squatter */
-  letter-spacing: 4px;
-  line-height: 1.1;
-  text-shadow: 4px 4px 0px rgba(0,0,0,0.08); /* Sharper, cleaner shadow */
+/* ========================================= */
+/* --- TYPOGRAPHY from image_8.png style --- */
+/* ========================================= */
+.header-section { margin-bottom: 50px; }
+
+/* The multi-colored title with layered shadow */
+.multi-color-title {
+  font-family: var(--font-serif);
+  font-size: 80px;
+  margin-bottom: 5px;
+  text-shadow: 
+    3px 3px 0 var(--shadow-red),
+    -3px -3px 0 var(--shadow-yellow),
+    3px -3px 0 var(--shadow-green),
+    -3px 3px 0 var(--shadow-pink);
+  letter-spacing: 5px;
+  position: relative;
+  z-index: 100; /* Ensure title is on top */
 }
 
-.color-pink { color: #FF2A85; }
-.color-brown { color: #8A4300; } /* Rich, punchy dark orange/brown */
-.color-yellow { color: #FFCC00; }
-.color-green { color: #00D26A; } /* Bright minty green */
-.color-red { color: #FF3B30; }   /* Pure vivid red */
-.color-blue { color: #0055FF; }  /* Electric blue */
+/* Individual letter colors for the multi-colored title, aligned with layered shadow */
+.color-pink { color: var(--shadow-pink); }
+.color-brown { color: var(--shadow-brown); }
+.color-yellow { color: var(--shadow-yellow); }
+.color-green { color: var(--shadow-green); }
+.color-red { color: var(--shadow-red); }
+.color-blue { color: var(--shadow-blue); }
 
 .subtitle {
-  font-family: 'Courier New', Courier, monospace; /* Typewriter accent */
-  font-size: 16px;
-  margin-top: 10px;
-  color: #555;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 20px;
+  color: #666666;
+  margin-top: -10px;
 }
 
-.section-title {
-  font-family: 'Titan One', cursive;
+.exercises-title {
+  font-family: var(--font-serif);
   font-size: 32px;
-  color: #FF3B30; /* Vivid red */
+  color: var(--color-exercises-title);
   margin-bottom: 20px;
-  padding-left: 20px;
-  letter-spacing: 2px;
 }
 
-/* --- LISTS & ALIGNMENT --- */
-.content-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 50px;
-}
-
-.info-list {
+/* ========================================= */
+/* --- FLOATING & HOVER REVEAL EFFECT --- */
+/* ========================================= */
+.floating-favourites-list {
   list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
+  width: 100%;
+  position: relative; /* Allows items to float within a specific area */
+  height: 300px; /* Area where items float, outside central static content */
+  margin: 0 auto 50px;
 }
 
-.info-list li {
+/* General interactive floating element */
+.floating-fav-item {
+  position: absolute;
   display: flex;
   align-items: center;
-  font-size: 20px;
-  font-weight: 700;
-  gap: 20px;
+  transition: all 0.3s ease-out; /* smooth hover expand */
+  
+  /* Starting, un-hovered state: look like a small emoji button */
+  overflow: hidden; /* Hide content text initially */
+  white-space: nowrap; /* Prevent text wrap on expand */
+  width: 50px; /* Small square width for the emoji blob only */
+  height: 50px;
+  border-radius: 25px; /* circular blob */
+  border: 3px solid #666; /* a plain edge when unhovered */
+  background-color: transparent; /* only the inner blob is colored */
+  box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+  cursor: pointer;
+  z-index: 20;
 }
 
-/* --- THE ORGANIC CUT-OUT BLOBS --- */
-.blob {
+/* Initial hidden state for content text */
+.reveal-content-text,
+.reveal-content-wrapper {
+  opacity: 0;
+  transition: opacity 0.2s ease-out 0.1s; /* delayed text reveal */
+  padding-left: 20px; /* space after emoji */
+  color: #1A1A1A;
+  font-size: 18px;
+}
+
+/* Special case for the website item with its button */
+.fav-website .reveal-content-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Inner colored blob for each emoji from image_8.png */
+.emoji-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 60px;
-  height: 60px;
-  /* Subtle drop shadow to look like layered paper */
-  box-shadow: 2px 4px 0px rgba(0,0,0,0.1);
+  font-size: 28px;
+  width: 44px; /* size to fit within the unhovered item */
+  height: 44px;
+  border-radius: 22px;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
 }
 
-.emoji {
-  font-size: 26px;
+/* Emoji blob colors from image_8.png */
+.emoji-container.red { background-color: var(--shadow-red); }
+.emoji-container.yellow { background-color: var(--shadow-yellow); }
+.emoji-container.blue { background-color: var(--shadow-blue); }
+
+/* POSITION EACH FAVOURITE AROUND THE CENTRAL AREA */
+.fav-food { top: 20px; left: 15%; }
+.fav-song { top: 120px; right: 20%; }
+.fav-website { bottom: 0; left: 30%; }
+
+/* --- HOVER REVEAL INTERACTION --- */
+/* The main list item blob itself expands on hover */
+.floating-fav-item:hover {
+  width: auto; /* Expand width to show hidden text */
+  padding: 10px; /* Add padding when expanded */
+  border-color: #1A1A1A; /* Darken border on hover */
+  border-radius: 20px; /* become a larger, more irregular cutout shape */
+  background-color: rgba(255, 255, 255, 0.8); /* a light background reveals behind the text */
+  z-index: 21; /* Bring to front on hover */
 }
 
-/* Different blob background colors */
-.bg-red { background-color: #FF3B30; }
-.bg-yellow { background-color: #FFCC00; }
-.bg-blue { background-color: #0055FF; }
-.bg-green { background-color: #00D26A; }
-
-/* These border-radius percentages are what create the irregular shapes!
-  They define horizontal and vertical curves independently.
-*/
-.shape-1 { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-.shape-2 { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
-.shape-3 { border-radius: 50% 50% 20% 80% / 25% 80% 20% 75%; }
-.shape-4 { border-radius: 80% 20% 50% 50% / 50% 50% 50% 50%; }
-
-/* --- BUTTONS & LINKS --- */
-.website-item {
-  flex-wrap: wrap;
+/* The hidden content fades in when list item is hovered */
+.floating-fav-item:hover .reveal-content-text,
+.floating-fav-item:hover .reveal-content-wrapper {
+  opacity: 1;
 }
 
+/* Special hover behavior for food/sushi to create the pink/brown/green name color layered shadow look on hover */
+.fav-food:hover .emoji-container.red {
+  box-shadow: 
+    3px 3px 0 var(--shadow-brown),
+    -3px -3px 0 var(--shadow-green),
+    3px -3px 0 var(--shadow-yellow),
+    -3px 3px 0 var(--shadow-pink);
+}
+
+/* ========================================= */
+/* --- EXERCISES & BUTTONS from image_8.png style --- */
+/* ========================================= */
+.exercises-area {
+  position: relative;
+  z-index: 5;
+  margin: 0 auto;
+  width: max-content;
+  text-align: left;
+}
+
+.exercises-list {
+  list-style: none;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+/* Inline standard link blue from image_0.png */
+.inline-link-blue {
+  color: var(--color-inline-link);
+  text-decoration: underline;
+}
+
+/* Cutout button style from image_8.png style - both inline and on hover reveal */
 .cutout-btn {
-  background-color: #FFF;
-  color: #FF3B30;
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-weight: bold;
+  font-size: 14px;
   text-decoration: none;
-  padding: 10px 24px;
-  font-family: 'Fredoka', sans-serif;
-  font-weight: 600;
-  font-size: 16px;
-  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-  border: 3px solid #FF3B30; /* Thicker, bolder border */
-  margin-left: 10px;
-  transition: all 0.2s ease;
+  padding: 8px 16px;
+  border-radius: 12px;
+  transition: all 0.2s;
 }
 
-.cutout-btn:hover {
-  background-color: #FF3B30;
-  color: #FFF;
-  transform: scale(1.05) rotate(-3deg);
+/* Tetrio specific hand-drawn button style from image_8.png style */
+.cutout-btn[href*="tetr.io"] {
+  background-color: #333333; /* Dark gray for Tetrio button from image_0.png */
+  color: #FFFFFF;
+  border: 3px solid #D94841; /* Hand-drawn red outline from image_8.png style */
+  box-shadow: 6px 6px 0px rgba(0,0,0,0.1); /* Paper shadow */
+  border-radius: 20px 10px / 10px 20px; /* Irregular paper cut look */
 }
 
-.exercise-link {
-  color: #1A1A1A;
-  text-decoration: none;
-  /* Thin, delicate line like the poster */
-  border-bottom: 1px solid #1A1A1A; 
-  padding-bottom: 2px;
-  transition: color 0.2s;
-}
-
-.exercise-link:hover {
-  color: #2B4E9C;
-  border-bottom-color: #2B4E9C;
+/* Hand-drawn button hover from image_8.png style */
+.cutout-btn[href*="tetr.io"]:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0px rgba(0,0,0,0.1);
+  background-color: #1A1A1A; /* Darken background on hover */
 }
