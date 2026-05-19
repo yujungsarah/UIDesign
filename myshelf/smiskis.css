@@ -1,53 +1,68 @@
-
 * {
-	margin: 0px;
-	padding: 0px;
-	box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
 }
 
 body {
-	display: flex;
-	padding: 20px;
-	justify-content: center;
-	align-items: center;
-	min-height: 100vh;
-  	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  	background: black;
+    display: flex;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: black;
 }
 
 h1 {
-	position: fixed;
-	top: 20px;
-	left: 20px;
-	padding: 7px 20px;
-	background: white;
-	border-radius: 20px;
-	font-size: 18px;
+    position: fixed;
+    top: 30px;
+    left: 40px;
+    /* Neon Smiski green text */
+    color: #b8ff68; 
+    text-shadow: 0px 0px 15px rgba(184, 255, 104, 0.8);
+    font-size: 24px;
+    background: transparent; 
 }
 
 #bookcase {
-	width: 1200px;
-	height: 2000px;
-	display: grid;
-	grid-template-columns: 1fr;
-	grid-template-rows: 1fr 1fr 1fr 1fr;
-	justify-content: space-evenly;
-	border: 20px solid grey;
-	background: #333;
+    width: 1200px;
+    height: 2000px;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    justify-content: space-evenly;
+    /* Dark, moody room color */
+    background: #1a1e24; 
+    /* Dark wood border */
+    border: 20px solid #3d2b1f; 
 }
 
 .shelf {
-	width: 100%;
-	display: flex;
-	flex-direction: row;
-	align-items: flex-end;
-	justify-content: space-evenly;
-	border-bottom: 20px solid lightgrey;
-	padding: 10px 10px 0px 0px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    /* Fixed: makes them sit flat on the bottom */
+    align-items: flex-end; 
+    justify-content: space-evenly;
+    /* Lighter wood for the shelf bottom */
+    border-bottom: 20px solid #5c4332; 
+    padding: 10px 10px 0px 0px;
 }
 
 img {
-	width: 140px;
-	height: auto;
-	display: block;
+    /* Scaled up so they fill the tall bookcase better */
+    width: 220px; 
+    height: auto;
+    display: block;
+    /* The soft, resting glow */
+    filter: drop-shadow(0px 0px 15px rgba(184, 255, 104, 0.6));
+    transition: all 0.3s ease-in-out; 
+}
+
+/* The interactive hover animation */
+img:hover {
+    transform: translateY(-15px);
+    filter: drop-shadow(0px 0px 25px rgba(184, 255, 104, 0.9));
+    cursor: pointer;
 }
