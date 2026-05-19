@@ -6,63 +6,102 @@
 
 body {
     display: flex;
-    padding: 20px;
+    flex-direction: column; /* Stacks header above bookcase */
+    padding: 20px 20px 60px 20px; /* Space around content */
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: black;
+    background: #0d0b09; /* Deep, warm black background */
+}
+
+/* --- New Header Design --- */
+#main-header {
+    width: 1200px; /* Matches bookcase width */
+    background: rgba(255, 255, 255, 0.05); /* Slight dark overlay strip */
+    padding: 20px 40px;
+    margin-bottom: 30px; /* Gap before bookcase */
+    border-radius: 10px;
+    text-align: center;
 }
 
 h1 {
-    position: fixed;
-    top: 30px;
-    left: 40px;
-    /* Neon Smiski green text */
-    color: #b8ff68; 
+    color: #b8ff68; /* Default Smiski Green */
     text-shadow: 0px 0px 15px rgba(184, 255, 104, 0.8);
-    font-size: 24px;
-    background: transparent; 
+    font-size: 32px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
+h2 {
+    color: #a4dbff; /* Themed blue for the collection subtitle */
+    text-shadow: 0px 0px 15px rgba(164, 219, 255, 0.6);
+    font-size: 18px;
+    font-weight: 400;
+    margin-top: 5px;
+}
+
+/* --- Bookcase --- */
 #bookcase {
+    /* Keep existing width/height constraints */
     width: 1200px;
     height: 2000px;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
-    justify-content: space-evenly;
-    /* Dark, moody room color */
-    background: #1a1e24; 
-    /* Dark wood border */
-    border: 20px solid #3d2b1f; 
+    grid-template-rows: 1fr 1fr 1fr 1fr; /* 4 equal shelves */
+    
+    background: #141210; /* Darker interior color */
+    border: 25px solid #2e1e11; /* Rich dark wood border */
+    border-radius: 5px;
 }
 
+/* --- Shelf Interior --- */
 .shelf {
     width: 100%;
     display: flex;
     flex-direction: row;
-    /* Fixed: makes them sit flat on the bottom */
-    align-items: flex-end; 
-    justify-content: space-evenly;
-    /* Lighter wood for the shelf bottom */
-    border-bottom: 20px solid #5c4332; 
-    padding: 10px 10px 0px 0px;
+    align-items: flex-end; /* Smiskis sit flat */
+    justify-content: space-evenly; /* Default spacing */
+    
+    /* Stronger, more physical looking shelf board */
+    border-bottom: 30px solid #45301f; 
+    padding: 10px 30px 5px 30px; /* Extra padding inside */
 }
 
+/* --- Generic Smiski Images --- */
 img {
-    /* Scaled up so they fill the tall bookcase better */
-    width: 220px; 
+    width: 220px; /* Scaled up images */
     height: auto;
     display: block;
-    /* The soft, resting glow */
-    filter: drop-shadow(0px 0px 15px rgba(184, 255, 104, 0.6));
-    transition: all 0.3s ease-in-out; 
+    transition: all 0.3s ease-in-out;
 }
 
-/* The interactive hover animation */
-img:hover {
+/* --- Default Green Glow --- */
+img:not(.glow-blue) {
+    filter: drop-shadow(0px 0px 15px rgba(184, 255, 104, 0.6));
+}
+
+img:not(.glow-blue):hover {
     transform: translateY(-15px);
     filter: drop-shadow(0px 0px 25px rgba(184, 255, 104, 0.9));
     cursor: pointer;
+}
+
+/* --- Blue Glow Class --- */
+.glow-blue {
+    /* Different blue color drop-shadow */
+    filter: drop-shadow(0px 0px 15px rgba(104, 219, 255, 0.8));
+}
+
+.glow-blue:hover {
+    transform: translateY(-15px);
+    filter: drop-shadow(0px 0px 25px rgba(104, 219, 255, 1.0));
+    cursor: pointer;
+}
+
+/* --- Corner Smiski Placement --- */
+/* Target the image specifically and force it to the far right within the flex shelf */
+.corner-peek {
+    margin-left: auto;
+    margin-right: -10px; /* Nudges it slightly into the corner */
 }
