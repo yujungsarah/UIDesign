@@ -77,6 +77,8 @@ body {
 .icon-item:nth-child(5) { animation-delay: 0.2s; }
 .icon-item:nth-child(6) { animation-delay: 0.6s; }
 .icon-item:nth-child(7) { animation-delay: 0.3s; }
+.icon-item:nth-child(8) { animation-delay: 0.7s; } /* Added Alien */
+.icon-item:nth-child(9) { animation-delay: 0.45s; } /* Added Clock */
 
 .icon-item:hover {
   z-index: 50; /* Brings the hovered item to the very front */
@@ -97,6 +99,8 @@ body {
 .icon-item:nth-child(5) .emoji { transform: rotate(-8deg); }
 .icon-item:nth-child(6) .emoji { transform: rotate(22deg); }
 .icon-item:nth-child(7) .emoji { transform: rotate(-12deg); }
+.icon-item:nth-child(8) .emoji { transform: rotate(15deg); } /* Added Alien */
+.icon-item:nth-child(9) .emoji { transform: rotate(-20deg); } /* Added Clock */
 
 
 /* --- THE POPOVER TEXT --- */
