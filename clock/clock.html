@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>newton's clock</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden; 
+      background-image: url('ground.png');
+      background-size: cover;
+      background-position: center;
+      background-color: #2c2c2c; 
+      
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none; 
+      -webkit-user-select: none;
+      position: relative;
+    }
+
+    .canvas-wrapper {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      pointer-events: none; 
+    }
+
+    canvas {
+      max-width: 100%;
+      display: block;
+    }
+
+    .controls-container {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* --- REFINED DIGITAL TIME DISPLAY --- */
+    .time-display {
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 12px;
+    }
+
+    /* --- MINIMALIST MONOTONE ANALOG CLOCK --- */
+    .analog-clock {
+      position: relative;
+      width: 120px; 
+      height: 120px;
+      border-radius: 50%;
+      border: 2px solid #e0e0e0; 
+      background: #fdfdfd;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4); 
+      cursor: grab;
+      touch-action: none; 
+      pointer-events: auto; 
+    }
+    
+    .analog-clock:active {
+      cursor: grabbing;
+    }
+
+    .clock-mark {
+      position: absolute;
+      width: 2px;
+      height: 6px;
+      background: #ccc;
+      top: 4px;
+      left: 50%;
+      margin-left: -1px;
+      transform-origin: 50% 56px; 
+    }
+
+    .clock-mark:nth-child(3n) {
+      background: #888;
+      height: 10px;
+    }
+
+    .hand {
+      position: absolute;
+      bottom: 50%;
+      left: 50%;
+      transform-origin: bottom center;
+      border-radius: 4px;
+    }
+
+    .hour-hand {
+      width: 4px;
+      height: 30px;
+      background: #555; 
+      margin-left: -2px;
+      z-index: 3;
+    }
+
+    .minute-hand {
+      width: 2px;
+      height: 45px;
+      background: #222; 
+      margin-left: -1px;
+      z-index: 4;
+    }
+
+    .center-dot {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      background: #222;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="canvas-wrapper">
+    <canvas id="appleClock" width="700" height="700"></canvas>
+  </div>
+
+  <div class="controls-container">
+    <div class="time-display" id="timeDisplay">12 : 00</div>
+    <div class="analog-clock" id="analogClock">
+      <div class="hand hour-hand" id="hourHand"></div>
+      <div class="hand minute-hand" id="minuteHand"></div>
+      <div class="center-dot"></div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('appleClock');
+    const ctx = canvas.getContext('2d');
+    
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width = canvas.width;
+    offCanvas.height = canvas.height;
+    const offCtx = offCanvas.getContext('2d');
+
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const appleSize = 550; 
+
+    const timeDisplay = document.getElementById('timeDisplay');
+    const analogClock = document.getElementById('analogClock');
+    const hourHand = document.getElementById('hourHand');
+    const minuteHand = document.getElementById('minuteHand');
+
+    // --- DRAW CLOCK MARKS ---
+    for (let i = 0; i < 12; i++) {
+        const mark = document.createElement('div');
+        mark.classList.add('clock-mark');
+        mark.style.transform = `rotate(${i * 30}deg)`;
+        analogClock.appendChild(mark);
+    }
+
+    // --- STRICT SWARM LOGIC ---
+    const rawBites = [];
+    for (let i = 0; i < 2500; i++) {
+        const radius = Math.sqrt(Math.random()) * 260; 
+        const angle = Math.random() * Math.PI * 2;
+        const size = 12 + Math.random() * 25; 
+        const distScore = radius + (Math.random() * 30 - 15);
+
+        rawBites.push({
+            x: cx + Math.cos(angle) * radius,
+            y: cy + Math.sin(angle) * radius,
+            size: size,
+            radius: radius, 
+            distScore: distScore
+        });
+    }
+    rawBites.sort((a, b) => b.distScore - a.distScore);
+
+    const minuteBites = Array.from({length: 59}, () => []);
+    const outerBites = [];
+    const coreBites = [];
+
+    rawBites.forEach(bite => {
+        if (bite.radius - bite.size < 35) coreBites.push(bite); 
+        else outerBites.push(bite); 
+    });
+
+    const totalOuterMinutes = 58;
+    const dotsPerMinute = Math.ceil(outerBites.length / totalOuterMinutes);
+    
+    for(let i = 0; i < outerBites.length; i++) {
+        const chunkIndex = Math.floor(i / dotsPerMinute);
+        if(chunkIndex < totalOuterMinutes) minuteBites[chunkIndex].push(outerBites[i]);
+        else minuteBites[totalOuterMinutes - 1].push(outerBites[i]); 
+    }
+
+    minuteBites[58] = minuteBites[58].concat(coreBites);
+    minuteBites[58].push({ x: cx, y: cy, size: 200 });
+
+    // --- IMAGE LOADING ---
+    const appleImages = [];
+    let imagesLoaded = 0;
+    const totalImages = 12;
+
+    for (let i = 0; i < totalImages; i++) {
+        const img = new Image();
+        const indexStr = String(i).padStart(2, '0');
+        img.src = `apple${indexStr}.png`;
+        
+        img.onload = () => {
+            imagesLoaded++;
+            if (imagesLoaded === totalImages) renderCanvas();
+        };
+        
+        img.onerror = () => console.error(`Failed to load apple${indexStr}.png`);
+        appleImages.push(img);
+    }
+
+    // --- ANALOG DRAG LOGIC & STATE (INITIALIZED TO CURRENT TIME) ---
+    const now = new Date();
+    let totalMinutes = now.getHours() * 60 + now.getMinutes(); 
+    let prevHour = Math.floor(totalMinutes / 60);
+    
+    let isDragging = false;
+    let prevAngle = 0;
+
+    function getAngle(e) {
+        const rect = analogClock.getBoundingClientRect();
+        const clockX = rect.left + rect.width / 2;
+        const clockY = rect.top + rect.height / 2;
+        
+        let clientX = e.clientX;
+        let clientY = e.clientY;
+        
+        if (e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        }
+        
+        let angle = Math.atan2(clientY - clockY, clientX - clockX) * 180 / Math.PI;
+        angle += 90; 
+        if (angle < 0) angle += 360;
+        return angle;
+    }
+
+    function startDrag(e) {
+        if (e.cancelable) e.preventDefault();
+        isDragging = true;
+        prevAngle = getAngle(e);
+        handleDrag(e); 
+    }
+
+    function endDrag() {
+        isDragging = false;
+    }
+
+    function handleDrag(e) {
+        if (!isDragging) return;
+        if (e.cancelable) e.preventDefault();
+
+        const currentAngle = getAngle(e);
+        let deltaAngle = currentAngle - prevAngle;
+
+        if (deltaAngle > 180) deltaAngle -= 360;
+        else if (deltaAngle < -180) deltaAngle += 360;
+
+        totalMinutes += deltaAngle / 6;
+
+        if (totalMinutes < 0) totalMinutes += 1440;
+        if (totalMinutes >= 1440) totalMinutes -= 1440;
+
+        prevAngle = currentAngle;
+        updateTime();
+    }
+
+    analogClock.addEventListener('mousedown', startDrag);
+    analogClock.addEventListener('touchstart', startDrag, { passive: false });
+    window.addEventListener('mousemove', handleDrag);
+    window.addEventListener('touchmove', handleDrag, { passive: false });
+    window.addEventListener('mouseup', endDrag);
+    window.addEventListener('touchend', endDrag);
+
+    // --- DROP ANIMATION ---
+    function startDropAnimation() {
+        canvas.style.transition = 'none';
+        canvas.style.transform = 'scale(3)';
+        void canvas.offsetWidth; 
+        canvas.style.transition = 'transform 0.4s cubic-bezier(0.5, 0, 1, 1)';
+        canvas.style.transform = 'scale(1)';
+    }
+
+    function updateTime() {
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = Math.floor(totalMinutes % 60);
+
+        minuteHand.style.transform = `rotate(${minutes * 6}deg)`;
+        hourHand.style.transform = `rotate(${(hours % 12) * 30 + minutes * 0.5}deg)`;
+
+        timeDisplay.textContent = `${String(hours).padStart(2, '0')} : ${String(minutes).padStart(2, '0')}`;
+
+        // Only trigger drop animation if we've crossed an hour boundary 
+        // AND the user is actually interacting (prevents drop on first page load)
+        if (hours !== prevHour && isDragging) {
+            startDropAnimation();
+            prevHour = hours;
+        } else if (hours !== prevHour) {
+            // Silently update the hour reference on initial load
+            prevHour = hours; 
+        }
+
+        renderCanvas();
+    }
+
+    // --- ADVANCED RENDERING WITH DYNAMIC SHADOW ---
+    function renderCanvas() {
+        if (imagesLoaded < totalImages) return;
+
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = Math.floor(totalMinutes % 60);
+        const currentHourImageIndex = hours % 12;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        offCtx.clearRect(0, 0, offCanvas.width, offCanvas.height);
+        
+        offCtx.globalCompositeOperation = 'source-over';
+        offCtx.drawImage(appleImages[currentHourImageIndex], cx - appleSize/2, cy - appleSize/2, appleSize, appleSize);
+        
+        offCtx.globalCompositeOperation = 'destination-out';
+        offCtx.fillStyle = 'black'; 
+        
+        for (let i = 0; i < minutes; i++) {
+            const chunk = minuteBites[i];
+            for (let j = 0; j < chunk.length; j++) {
+                offCtx.beginPath();
+                offCtx.arc(chunk[j].x, chunk[j].y, chunk[j].size, 0, Math.PI * 2);
+                offCtx.fill();
+            }
+        }
+
+        ctx.save(); 
+        
+        // Apply dynamic shadow based on the remaining eaten apple shape
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.9)'; 
+        ctx.shadowBlur = 40; 
+        ctx.shadowOffsetX = 0; 
+        ctx.shadowOffsetY = 0; 
+        
+        // Stamp off-screen canvas to main canvas
+        ctx.drawImage(offCanvas, 0, 0); 
+        
+        ctx.restore(); 
+    }
+
+    // Trigger initial UI update based on current time
+    updateTime();
+  </script>
+</body>
+</html>
