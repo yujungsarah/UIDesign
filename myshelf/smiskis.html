@@ -1,31 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>yujung's smiskis</title>
+    <title>the smiskis don't like to be seen...</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="smiskis.css" type="text/css" />
 </head>
 <body>
 
-    <header id="main-header">
-        <h1>The Smiski Collection</h1>
-        <h2>Yujung's Shelf &bull; 2026</h2>
-    </header>
+    <div id="bookcase-wrapper">
+        
+        <div id="arch-container">
+            <svg id="arch-text-svg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMin meet">
+                <path id="arch-path" d="M 30,400 A 370,370 0 0,1 770,400" fill="none" />
+                <text class="embossed-text">
+                    <textPath href="#arch-path" startOffset="50%" text-anchor="middle">
+                        the smiskis don't like to be seen...
+                    </textPath>
+                </text>
+            </svg>
+        </div>
 
-    <div id="bookcase">
-        <div class="shelf">
+        <div id="bookcase">
+            <div class="shelf top-shelf">
+                <div class="smiski-wrapper smiski-top-1">
+                    <img src="img/img_cheer_02.png" alt="cheer smiski 2" class="smiski"/>
+                    <div class="bubble">no...</div>
+                </div>
+                <div class="smiski-wrapper smiski-top-2">
+                    <img src="img/img_cheer_04.png" alt="cheer smiski 4" class="smiski"/>
+                    <div class="bubble">stop...</div>
+                </div>
+                <div class="smiski-wrapper smiski-top-3">
+                    <img src="img/img_cheer_06.png" alt="cheer smiski 6" class="smiski"/>
+                    <div class="bubble">go away...</div>
+                </div>
+            </div>
             
-            <img src="img/guitar_smiski.png" alt="guitar smiski" class="glow-green"/>
-            <img src="img/help_smiski.png" alt="help smiski" class="glow-blue"/>
-            <img src="img/pants_smiski.png" alt="pants smiski" class="glow-green"/>
-            <img src="img/sleep_smiski.png" alt="sleep smiski" class="glow-green"/>
-            <img src="img/watching_smiski.png" alt="watching smiski" class="glow-green"/>
-            <img src="img/yoga_smiski.png" alt="yoga smiski" class="glow-green"/>
-            
-            <img src="img/peek_smiski.png" alt="peek smiski" class="glow-blue corner-peek"/>
-            
+            <div class="shelf bottom-shelf">
+                <div class="smiski-wrapper smiski-bot-1">
+                    <img src="img/img_yoga_01.png" alt="yoga smiski 1" class="smiski"/>
+                    <div class="bubble">too bright...</div>
+                </div>
+                <div class="smiski-wrapper smiski-bot-2">
+                    <img src="img/img_yoga_02.png" alt="yoga smiski 2" class="smiski"/>
+                    <div class="bubble">shh...</div>
+                </div>
+                <div class="smiski-wrapper smiski-bot-3">
+                    <img src="img/img_yoga_04.png" alt="yoga smiski 4" class="smiski"/>
+                    <div class="bubble">umm...</div>
+                </div>
+            </div>
+
+            <div class="shelf empty-shelf"></div>
         </div>
     </div>
 
+    <div id="flashlight"></div>
+
+    <script>
+        const flashlight = document.getElementById('flashlight');
+        
+        // --- FLASHLIGHT LOGIC ---
+        document.addEventListener('mousemove', function(e) {
+            let x = e.clientX;
+            let y = e.clientY;
+            
+            requestAnimationFrame(() => {
+                flashlight.style.background = `radial-gradient(
+                    circle 280px at ${x}px ${y}px, 
+                    transparent 0%, 
+                    rgba(5, 25, 10, 0.4) 40%, 
+                    rgba(2, 10, 5, 0.95) 80% 
+                )`;
+            });
+        });
+
+        // --- DISAPPEAR/REAPPEAR LOGIC ---
+        const smiskis = document.querySelectorAll('.smiski-wrapper');
+        smiskis.forEach(wrapper => {
+            let hideTimer; 
+            let showTimer; 
+            
+            wrapper.addEventListener('mouseenter', () => {
+                clearTimeout(showTimer); 
+                hideTimer = setTimeout(() => {
+                    wrapper.style.opacity = '0'; 
+                }, 1000); 
+            });
+            
+            wrapper.addEventListener('mouseleave', () => {
+                clearTimeout(hideTimer); 
+                showTimer = setTimeout(() => {
+                    wrapper.style.opacity = '1'; 
+                }, 1000); 
+            });
+        });
+    </script>
 </body>
 </html>

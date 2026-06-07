@@ -1,106 +1,228 @@
 * {
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
 body {
+    background: #020a05; 
+    height: 100vh;
     display: flex;
-    flex-direction: column; 
-    padding: 60px; 
-    align-items: center;
-    min-height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    /* Clean, light editorial background */
-    background: #f4f6f8; 
-    color: #111;
+    align-items: flex-end; 
+    justify-content: center;
+    overflow: hidden;
+    font-family: 'Comic Sans MS', 'Caveat', cursive, sans-serif; 
 }
 
-/* --- Clean, Minimalist Header --- */
-#main-header {
-    width: 1200px; 
-    text-align: left; 
-    margin-bottom: 80px; 
-    padding-left: 20px;
-    /* Sleek black accent line */
-    border-left: 4px solid #111; 
+/* --- WRAPPER STYLES --- */
+#bookcase-wrapper {
+    position: relative;
+    width: 60vw;
+    max-width: 800px;
+    height: 90vh; 
+    min-height: 750px;
 }
 
-h1 {
-    font-size: 32px;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    font-weight: 800;
-    margin-bottom: 5px;
-}
-
-h2 {
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 400;
-    color: #666;
-}
-
-/* --- Bookcase Container --- */
+/* --- BOOKCASE STYLES --- */
 #bookcase {
-    width: 1200px;
-    display: flex;
-    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    
+    background: #a4ce5f; 
+    border: 60px solid #a4ce5f;
+    border-bottom: none; 
+    
+    border-top-left-radius: 400px; 
+    border-top-right-radius: 400px; 
+    box-shadow: inset 0px 15px 30px rgba(0,0,0,0.15); 
+    
+    display: grid;
+    grid-template-rows: 1fr 1fr 100px; 
+    
+    position: relative;
+    overflow: hidden; 
+    
+    isolation: isolate;
+    transform: translate3d(0, 0, 0);
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    mask-image: radial-gradient(white, black);
 }
 
-/* --- Glass Shelf Effect --- */
+/* --- ARCH CURVED TEXT (SVG) --- */
+#arch-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    z-index: 20; 
+}
+
+#arch-text-svg {
+    width: 100%;
+    height: auto;
+}
+
+.embossed-text {
+    fill: #9bc555; 
+    font-size: 26px;
+    font-family: 'Comic Sans MS', 'Caveat', cursive, sans-serif;
+    font-weight: bold;
+    letter-spacing: 3px;
+    filter: drop-shadow(-2px -2px 2px rgba(0, 0, 0, 0.4)) drop-shadow(2px 2px 2px rgba(255, 255, 255, 0.6));
+}
+
+/* --- SHELF STYLES --- */
 .shelf {
     width: 100%;
     display: flex;
     flex-direction: row;
     align-items: flex-end; 
-    justify-content: flex-start; /* Groups regular Smiskis to the left */
-    gap: 30px; /* Even spacing between items */
-    
-    /* Creates the visual of a pane of glass */
-    background: linear-gradient(to bottom, rgba(255,255,255,0) 80%, rgba(180, 210, 225, 0.3) 100%);
-    border-bottom: 4px solid rgba(160, 200, 215, 0.6); 
-    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.05); 
-    
-    padding: 10px 20px 0px 20px;
-    border-radius: 2px;
+    justify-content: space-evenly;
+    position: relative;
+    padding-bottom: 25px; 
 }
 
-/* --- Smiski Images --- */
-img {
-    width: 140px; /* Sized perfectly so all 7 fit on one row */
-    height: auto;
+.shelf::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 25px;
+    background: #8cb34e;
+    z-index: 10; 
+}
+
+.empty-shelf::after {
+    display: none;
+}
+
+/* --- SMISKI WRAPPERS & BUBBLES --- */
+.smiski-wrapper {
+    position: relative;
+    display: inline-block;
+    z-index: 5;
+    transition: opacity 0.4s ease;
+    will-change: opacity, transform;
+}
+
+.smiski {
+    height: 200px; 
+    width: auto;
     display: block;
-    transition: all 0.3s ease-in-out;
+    padding: 0px 15px;
+    
+    transition: filter 0.3s ease-in-out;
+    filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.7));
+    will-change: filter;
 }
 
-/* --- Explicit Green Glow --- */
-.glow-green {
-    filter: drop-shadow(0px 0px 15px rgba(184, 255, 104, 0.4));
+.top-shelf .smiski { height: 240px; }
+.smiski-bot-2 .smiski { height: 180px; } 
+
+.smiski-wrapper:hover .smiski {
+    filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0px 0px 30px rgba(184, 255, 104, 1));
 }
 
-.glow-green:hover {
-    transform: translateY(-10px);
-    filter: drop-shadow(0px 0px 20px rgba(184, 255, 104, 0.8));
-    cursor: pointer;
+.bubble {
+    position: absolute;
+    top: 15px; /* Default height */
+    left: 50%;
+    transform: translateX(-50%) scale(0.8);
+    background: rgba(255, 255, 255, 0.95);
+    color: #020a05;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: bold;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 30;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+    
+    transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
 }
 
-/* --- Explicit Blue Glow --- */
-.glow-blue {
-    filter: drop-shadow(0px 0px 15px rgba(104, 219, 255, 0.4));
+.bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px 6px 0;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.95) transparent transparent transparent;
 }
 
-.glow-blue:hover {
-    transform: translateY(-10px);
-    filter: drop-shadow(0px 0px 20px rgba(104, 219, 255, 0.8));
-    cursor: pointer;
+.smiski-wrapper:hover .bubble {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
 }
 
-/* --- Corner Smiski Placement --- */
-.corner-peek {
-    /* This command shoves the item to the far right side of the flexbox */
-    margin-left: auto; 
-    /* Pulls it slightly off the edge so it "peeks" */
-    margin-right: -10px; 
+/* ========================================================================= */
+/* SMISKI POSITION CONTROLS                                                  */
+/* ========================================================================= */
+
+.smiski-top-1 { 
+    margin-bottom: -30px; 
+    transform: translate(-5px, -8px) translateZ(0); 
+} 
+.smiski-top-2 { 
+    margin-bottom: -30px; 
+    transform: translate(-70px, -12px) translateZ(0); 
+} 
+.smiski-top-3 { 
+    margin-bottom: -40px; 
+    transform: translate(-110px, -8px) translateZ(0); 
+} 
+
+.smiski-bot-1 { 
+    margin-bottom: -35px; 
+    transform: translate(-25px, -5px) translateZ(0); 
+} 
+.smiski-bot-2 { 
+    margin-bottom: -20px; 
+    transform: translate(-60px, -7px) translateZ(0); 
+} 
+.smiski-bot-3 { 
+    margin-bottom: -40px; 
+    transform: translate(-100px, -11px) translateZ(0); 
+} 
+
+/* ========================================================================= */
+/* BUBBLE POSITION CONTROLS                                                  */
+/* Change the 'top' value to move bubbles higher (more negative) or lower.   */
+/* ========================================================================= */
+
+.smiski-top-1 .bubble { top: 15px; }
+.smiski-top-2 .bubble { top: 15px; }
+.smiski-top-3 .bubble { top: 15px; }
+
+.smiski-bot-1 .bubble { top: 15px; }
+.smiski-bot-2 .bubble { top: -25px; } /* Moved up to clear the face */
+.smiski-bot-3 .bubble { top: -25px; } /* Moved up to clear the face */
+
+/* ========================================================================= */
+
+/* --- FLASHLIGHT --- */
+#flashlight {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 15; 
+    pointer-events: none;
+    
+    will-change: background;
+    transform: translateZ(0);
+    
+    background: radial-gradient(
+        circle 280px at 50% 50%, 
+        transparent 0%, 
+        rgba(5, 25, 10, 0.4) 40%, 
+        rgba(2, 10, 5, 0.95) 80%
+    );
 }

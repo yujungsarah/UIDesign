@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Out Of Obligation</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Yellowtail&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background-color: #111; 
+            color: #111;
+            font-family: 'Futura', 'Trebuchet MS', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- THE GENERATOR UI --- */
+        #generator-ui {
+            background-color: #f3ebd5; 
+            width: 100%;
+            max-width: 650px;
+            padding: 40px;
+            border: 3px solid #111;
+            box-shadow: 12px 12px 0px #000; 
+            z-index: 1000; 
+            position: relative;
+        }
+
+        /* Apply texture directly over the generator UI */
+        #generator-ui::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('papertexture.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.65; 
+            mix-blend-mode: multiply; 
+            pointer-events: none; 
+            z-index: 9999; /* Forces it above all text/borders */
+        }
+
+        /* Transparent Logo Setup */
+        .main-logo {
+            width: 100%;
+            max-width: 300px;
+            display: block;
+            margin: 0 auto 25px auto;
+            /* Removed the border-bottom here */
+            padding-bottom: 15px;
+        }
+        
+        /* --- GUILT METER --- */
+        #guilt-container {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 2px dashed #111;
+            background-color: rgba(0,0,0,0.03);
+        }
+        .guilt-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; font-size: 1rem; }
+        .guilt-bar-bg { width: 100%; height: 20px; border: 2px solid #111; background-color: #fff; position: relative; }
+        #guilt-bar-fill { height: 100%; width: 0%; background-color: #d12020; transition: width 0.5s ease-out; }
+        #guilt-warning { color: #d12020; font-weight: bold; margin-top: 10px; text-align: center; min-height: 20px; font-size: 0.9rem; }
+
+        /* --- INPUT FORM --- */
+        .typewriter-form { font-size: 1.1rem; line-height: 2.2; margin-bottom: 40px; font-weight: bold; }
+        input[type="text"] {
+            background-color: rgba(255,255,255,0.7);
+            border: 2px solid #111;
+            color: #111;
+            font-family: inherit;
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 2px 10px;
+            width: 190px;
+            outline: none;
+        }
+        input[type="text"]:focus { background-color: #00FF88; }
+
+        /* --- CUSTOM RETRO SLIDERS --- */
+        .sliders { display: flex; flex-direction: column; gap: 25px; margin-bottom: 40px; }
+        .slider-container { display: flex; flex-direction: column; gap: 8px; }
+        .slider-labels { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; }
+        
+        input[type="range"] { 
+            -webkit-appearance: none;
+            width: 100%; 
+            height: 8px;
+            background: #d3d3d3; 
+            border-radius: 10px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50px;
+            background: #f3ebd5;
+            border: 2px solid #ddd;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        button.primary-btn {
+            background-color: #111;
+            color: #f3ebd5;
+            border: none;
+            padding: 15px 35px;
+            font-family: inherit;
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            width: 100%;
+        }
+        button.primary-btn:active { background-color: #00FF88; color: #111; }
+
+        /* --- MESSY TABLE OUTPUT TRAY --- */
+        #output-tray {
+            width: 100%;
+            max-width: 1000px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        #receipt-stack {
+            width: 100%;
+            position: relative; 
+            min-height: 750px;  
+        }
+
+        .receipt-wrapper {
+            position: absolute;
+            top: 0;
+            left: 25%; 
+            width: 50%;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* --- HORIZONTAL PASS ARCHITECTURE --- */
+        .receipt {
+            color: #111;
+            width: 650px; 
+            height: auto;
+            display: flex;
+            border: 3px solid #111;
+            box-shadow: 5px 5px 20px rgba(0,0,0,0.5); 
+            position: relative;
+            
+            transform: translateY(-200px) scale(0.8);
+            opacity: 0;
+            transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
+        }
+
+        /* Apply texture directly over the printed receipt */
+        .receipt::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('papertexture.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.65; 
+            mix-blend-mode: multiply; 
+            pointer-events: none; 
+            z-index: 9999; 
+        }
+
+        .receipt.printing {
+            transform: translateY(0) scale(1); 
+            opacity: 1;
+        }
+
+        .punch-hole-gutter {
+            width: 45px;
+            border-right: 3px solid #111;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            padding: 15px 0;
+            background-color: rgba(0,0,0,0.08);
+        }
+
+        .hole {
+            width: 14px;
+            height: 14px;
+            background-color: #111; 
+            border: 3px solid #111;
+            border-radius: 50%;
+        }
+
+        .ticket-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ticket-header-block { display: flex; border-bottom: 3px solid #111; font-size: 0.85rem; font-weight: bold; }
+        .header-cell { padding: 10px 15px; border-right: 3px solid #111; }
+        .header-cell:last-child { border-right: none; }
+
+        .ticket-logo-bar {
+            padding: 15px;
+            background-color: rgba(0,0,0,0.04);
+            border-bottom: 3px solid #111;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .receipt-logo-img { height: 35px; object-fit: contain; }
+
+        .ticket-content-pane {
+            padding: 20px 15px;
+            font-size: 1rem;
+            line-height: 1.5;
+            flex: 1;
+            border-bottom: 3px solid #111;
+        }
+        
+        .metadata-label { font-size: 0.75rem; font-weight: bold; color: #333; text-transform: uppercase; margin-bottom: 5px; }
+
+        .ticket-footer-block { display: flex; background-color: rgba(0,0,0,0.05); font-size: 0.85rem; font-weight: bold; align-items: stretch; }
+        .footer-cell { padding: 12px 15px; border-right: 3px solid #111; display: flex; flex-direction: column; justify-content: center; }
+        .footer-cell:last-child { border-right: none; }
+
+        .cursive-branding {
+            font-family: 'Yellowtail', cursive;
+            color: #d12020;
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .ticket-barcode-strip {
+            height: 40px;
+            width: 140px;
+            background: repeating-linear-gradient(90deg, #111, #111 2px, transparent 2px, transparent 5px, #111 5px, #111 6px, transparent 6px, transparent 9px);
+        }
+
+        /* --- COPY LINK BUTTON --- */
+        button.share-btn {
+            background-color: transparent;
+            color: #111;
+            border: 2px solid #111;
+            padding: 8px 12px;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            position: relative; 
+            z-index: 10000; /* Must sit above the texture layer to be clickable */
+            display: flex;
+            align-items: center;
+            /* Removed emoji */
+        }
+        button.share-btn:active { background-color: #111; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <div id="generator-ui">
+        <img src="Artboard 1ooo.png" alt="Out of Obligation" class="main-logo">
+        
+        <div id="guilt-container">
+            <div class="guilt-header">
+                <span>CONSCIENCE LOAD:</span>
+                <span id="guilt-text">0%</span>
+            </div>
+            <div class="guilt-bar-bg">
+                <div id="guilt-bar-fill"></div>
+            </div>
+            <div id="guilt-warning"></div>
+        </div>
+
+        <div class="typewriter-form">
+            I, the undersigned, must formally request an exemption status from <input type="text" id="person-input" placeholder="e.g. dad" autocomplete="off">.<br><br>
+            I am physically/mentally unable to attend <input type="text" id="event-input" placeholder="e.g. his birthday" autocomplete="off">.
+        </div>
+
+        <div class="sliders">
+            <div class="slider-container">
+                <div class="slider-labels"><span>Standard Logic</span><span>Complete Chaos</span></div>
+                <input type="range" id="realism-slider" class="styled-slider" min="1" max="10" value="5">
+            </div>
+            <div class="slider-container">
+                <div class="slider-labels"><span>Corporate</span><span>Casual</span></div>
+                <input type="range" id="formality-slider" class="styled-slider" min="1" max="10" value="5">
+            </div>
+        </div>
+
+        <button id="generate-btn" class="primary-btn">Print Dispensation Pass</button>
+    </div>
+
+    <div id="output-tray">
+        <div id="receipt-stack">
+            </div>
+    </div>
+
+    <script>
+        // Custom Slider Fill Logic
+        document.querySelectorAll('input[type="range"]').forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const value = (e.target.value - e.target.min) / (e.target.max - e.target.min) * 100;
+                e.target.style.background = `linear-gradient(to right, #111 ${value}%, #d3d3d3 ${value}%)`;
+            });
+            slider.dispatchEvent(new Event('input'));
+        });
+
+        const dictionary = {
+            realisticFormal: {
+                intros: ["Please accept this as formal notification of my absence.", "I am writing to formally request to be excused.", "I will unfortunately be unable to attend this event."],
+                reasons: ["An urgent professional matter requires my immediate attention.", "A sudden family obligation has arisen that I must attend to.", "I am currently dealing with an unexpected health issue."],
+                outros: ["This renders my participation impossible.", "I hope you can understand my absence.", "I sincerely apologize for the inconvenience."]
+            },
+            realisticInformal: {
+                intros: ["I am so sorry, but I absolutely cannot make it.", "I'm going to have to bail on this one.", "I hate to do this, but I have to skip this event."],
+                reasons: ["I woke up feeling super sick and need to stay in bed.", "I completely double-booked myself today and am stuck.", "My car battery died and I am currently stranded."],
+                outros: ["Maybe we can catch up next time!", "Hope you all have fun without me.", "I'll definitely make it up to you later."]
+            },
+            absurdFormal: {
+                intros: ["It is with deep existential regret that I must withdraw my presence.", "I am legally and physically obligated to remain absent.", "Please be advised that my attendance is no longer a physical possibility."],
+                reasons: ["My residence has been commandeered by a sovereign nation of aggressive geese.", "A localized black hole has formed directly in my living room.", "I am currently undergoing an unexpected metamorphosis into a 19th-century grandfather clock."],
+                outros: ["This renders my departure physically impossible.", "Please forward my regards to the authorities.", "Do not attempt a rescue mission."]
+            },
+            absurdInformal: {
+                intros: ["You are not going to believe this, but I absolutely cannot make it.", "I am literally crying right now, but there is zero chance I can attend.", "I'm gonna keep it 100 with you, I'm completely trapped."],
+                reasons: ["My Roomba just formed a union and is currently holding me hostage.", "A stray pigeon stole my wallet and is actively trying to buy bread.", "I just got drafted into a secret war between the local squirrels and pigeons."],
+                outros: ["I am literally fighting for my life right now.", "Please don't ask any follow-up questions.", "Send help if you don't hear from me by tomorrow."]
+            }
+        };
+
+        const passColors = ['#f3ebd5', '#ff9ebb', '#a2d2ff', '#eef24f', '#fff5a5', '#e8c5ff'];
+        let colorIndex = 0;
+
+        function pickRandom(array) { return array[Math.floor(Math.random() * array.length)]; }
+
+        function generateExcuse(realism, formality) {
+            let category = "realisticFormal";
+            if (realism <= 5 && formality > 5) category = "realisticInformal";
+            if (realism > 5 && formality <= 5) category = "absurdFormal";
+            if (realism > 5 && formality > 5) category = "absurdInformal";
+
+            let intro = pickRandom(dictionary[category].intros);
+            let reason = pickRandom(dictionary[category].reasons);
+            let outro = pickRandom(dictionary[category].outros);
+
+            return `${intro} ${reason} ${outro}`;
+        }
+
+        let receiptCount = 0;
+        let guiltLevel = 0;
+        const stackContainer = document.getElementById('receipt-stack');
+
+        function updateGuilt() {
+            if (guiltLevel < 100) guiltLevel += 20; 
+            document.getElementById('guilt-text').innerText = guiltLevel + '%';
+            document.getElementById('guilt-bar-fill').style.width = guiltLevel + '%';
+
+            if (guiltLevel >= 100) {
+                document.getElementById('guilt-warning').innerText = "CRITICAL GUILT OVERLOAD. CHARACTER REPUTATION DESTROYED.";
+            } else if (guiltLevel >= 60) {
+                document.getElementById('guilt-warning').innerText = "Anxiety levels spiking.";
+            }
+        }
+
+        function getConscienceDiagnosis(guilt) {
+            if (guilt <= 20) return "RELUCTANT AVOIDER";
+            if (guilt <= 40) return "CASUAL FLAKER";
+            if (guilt <= 60) return "COMMON LIAR";
+            if (guilt <= 80) return "HABITUAL FABRICATOR";
+            return "PATHOLOGICAL MENACE";
+        }
+
+        function printNewReceipt(payload, isViewerMode) {
+            receiptCount++;
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'receipt-wrapper';
+            wrapper.style.zIndex = receiptCount; 
+            
+            const receipt = document.createElement('div');
+            receipt.className = 'receipt'; 
+            
+            receipt.style.backgroundColor = passColors[colorIndex % passColors.length];
+            colorIndex++;
+
+            const serialNum = "00" + Math.floor(Math.random() * 89999 + 10000); 
+
+            let actionCell = `<div class="cursive-branding">Thank You!</div>`;
+            if (!isViewerMode) {
+                const encodedData = btoa(encodeURIComponent(JSON.stringify(payload)));
+                const shareUrl = `${window.location.origin}${window.location.pathname}?subpoena=${encodedData}`;
+                // Removed the emoji from the button text here
+                actionCell = `<button class="share-btn" onclick="navigator.clipboard.writeText('${shareUrl}'); this.innerText='COPIED!';">COPY LINK</button>`;
+            }
+            
+            let html = `
+                <div class="punch-hole-gutter">
+                    <div class="hole"></div>
+                    <div class="hole"></div>
+                    <div class="hole"></div>
+                    <div class="hole"></div>
+                </div>
+                
+                <div class="ticket-main">
+                    <div class="ticket-header-block">
+                        <div class="header-cell" style="flex: 1;">
+                            <div class="metadata-label">TO STATUS:</div>
+                            <strong style="text-transform: uppercase; font-size: 1.1rem;">${payload.person}</strong>
+                        </div>
+                        <div class="header-cell" style="width: 180px;">
+                            <div class="metadata-label">VALID TIMESTAMP:</div>
+                            <strong>${payload.timestamp}</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="ticket-logo-bar">
+                        <img src="Artboard 1ooo.png" alt="Out of Obligation" class="receipt-logo-img">
+                        <span style="color:#d12020; font-size:1.2rem; font-weight:900;">${serialNum}</span>
+                    </div>
+                    
+                    <div class="ticket-content-pane">
+                        <div class="metadata-label" style="margin-bottom: 10px;">OBLIGATION TO VOID: <span style="color:#d12020; text-transform:uppercase;">${payload.event}</span></div>
+                        <strong style="font-size: 1.1rem;">${payload.excuse}</strong>
+                    </div>
+                    
+                    <div class="ticket-footer-block">
+                        <div class="footer-cell" style="flex: 1;">
+                            <div class="metadata-label">CONSCIENCE DIAGNOSIS:</div>
+                            <span style="color:#d12020; font-weight:900; font-size:1rem;">${payload.conscience}</span>
+                        </div>
+                        <div class="footer-cell" style="width: 160px; align-items:center;">
+                            <div class="ticket-barcode-strip"></div>
+                        </div>
+                        <div class="footer-cell" style="padding-right: 15px;">
+                            ${actionCell}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            receipt.innerHTML = html;
+            wrapper.appendChild(receipt);
+            stackContainer.appendChild(wrapper);
+            
+            void receipt.offsetWidth;
+            receipt.classList.add('printing');
+
+            setTimeout(() => {
+                const randomAngle = (Math.random() * 40) - 20; 
+                const randomX = (Math.random() * 320) - 160;   
+                const randomY = (Math.random() * 180) - 40;    
+                
+                wrapper.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomAngle}deg)`;
+            }, 50); 
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const subpoenaData = urlParams.get('subpoena');
+
+        if (subpoenaData) {
+            document.getElementById('generator-ui').style.display = 'none';
+            try {
+                const payload = JSON.parse(decodeURIComponent(atob(subpoenaData)));
+                printNewReceipt(payload, true);
+            } catch (e) {
+                alert("Corrupted data payload.");
+            }
+        } else {
+            document.getElementById('generate-btn').addEventListener('click', () => {
+                const person = document.getElementById('person-input').value || "Recipient";
+                const event = document.getElementById('event-input').value || "Obligation";
+                const realism = parseInt(document.getElementById('realism-slider').value);
+                const formality = parseInt(document.getElementById('formality-slider').value);
+                
+                const now = new Date();
+                const timeString = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}/${now.getFullYear().toString().substring(2)}`;
+
+                const generatedText = generateExcuse(realism, formality);
+                
+                updateGuilt(); 
+                const currentDiagnosis = getConscienceDiagnosis(guiltLevel);
+
+                const payload = { 
+                    person: person, 
+                    event: event, 
+                    excuse: generatedText, 
+                    timestamp: timeString,
+                    conscience: currentDiagnosis
+                };
+
+                printNewReceipt(payload, false);
+            });
+        }
+    </script>
+</body>
+</html>
