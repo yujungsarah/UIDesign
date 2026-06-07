@@ -3,208 +3,507 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Out Of Obligation</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Yellowtail&display=swap" rel="stylesheet">
-    
+    <title>late mate</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;700;900&family=Caveat:wght@700&display=swap" rel="stylesheet">
+
     <style>
+        /* ================================================================== */
+        /* MASTER CONTROL PANEL                                                */
+        /* Change these values only. Sizes and positions are separate.          */
+        /* ================================================================== */
+        :root {
+            /* PRINTER SIZE AND POSITION */
+            --printer-width: 1280px;
+            --printer-center-x: 30vw;
+            --printer-center-y: 55vh;
+
+            /* EYEBALL LAYER */
+            /* Eyeballs are separate from the printer now, so they can sit above the input slip. */
+            --eye-overlay-z-index: 140;
+
+            /* INPUT SLIP SIZE AND POSITION */
+            --input-width: 540px;
+            --input-height: 230px;
+            --input-center-x: 75vw;
+            --input-center-y: 40vh;
+
+            /* INPUT SLIP INTERNAL FITTING */
+            --input-padding-x: 22px;
+            --input-padding-y: 14px;
+            --input-text-size: 0.82rem;
+            --input-name-size: 1.35rem;
+            --input-name-width: 140px;
+            --input-label-size: 0.72rem;
+            --input-button-size: 0.82rem;
+            --input-slider-gap: 6px;
+            --input-minutes-width: 78px;
+            --input-minutes-size: 1rem;
+
+            /* INPUT MASK / SLIDE-IN CONTROL */
+            /*
+                The input slip slides LEFT into this invisible mask.
+
+                --input-mask-left-x controls the exact vertical edge where the slip disappears.
+                Move it right if the slip disappears too early.
+                Move it left if the slip disappears too late.
+
+                --input-mask-z-index keeps the animated input slip IN FRONT of the printer.
+                The eye overlay still appears above it.
+            */
+            --input-mask-left-x: 40%;
+            --input-mask-left-nudge: 5px;
+            --input-mask-top: -50vh;
+            --input-mask-width: 120vw;
+            --input-mask-height: 160vh;
+            --input-mask-z-index: 34;
+            --input-slide-tuck: 35px;
+            --input-slide-duration: 1100ms;
+
+            /* OUTPUT SLIP SIZE */
+            --receipt-width: 520px;
+            --receipt-scale: 0.72;
+
+            /* OUTPUT SLIP APPEARANCE POINT */
+            /* These are relative to the printer image. */
+            --output-appear-x: 50%;
+            --output-appear-y: 56.3%;
+
+            /* OUTPUT SLIP RESTING POSITION */
+            --output-drop-distance: 24px;
+            --receipt-stack-gap: 9px;
+
+            /* OUTPUT TRAY MASK AREA */
+            --output-tray-width: 110%;
+            --output-tray-height: 70%;
+        }
+        /* ================================================================== */
+
+
+        /* --- RESET AND BASE --- */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        
+
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            overscroll-behavior: none;
+        }
+
         body {
-            background-color: #111; 
-            color: #111;
-            font-family: 'Futura', 'Trebuchet MS', Arial, sans-serif;
+            width: 100vw;
+            height: 100dvh;
+            min-height: 100vh;
+            overflow: hidden !important;
+            position: fixed;
+            inset: 0;
+            background-color: #ffffff;
+            color: #000000;
+            font-family: "Helvetica Neue", Helvetica, "Arimo", Arial, sans-serif;
+            background-image: radial-gradient(#e5e5e5 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            background: #fff;
+            padding: 8px 16px;
+            border: 2px solid #000;
+            border-radius: 20px;
+            transition: all 0.2s;
+            z-index: 9999;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        .back-btn:hover {
+            background: #000;
+            color: #fff;
+        }
+
+        .app-container {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100dvh;
+            overflow: hidden;
+        }
+
+
+        /* --- PRINTER SECTION --- */
+        .printer-section {
+            width: var(--printer-width);
+            position: fixed;
+            left: var(--printer-center-x);
+            top: var(--printer-center-y);
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            overflow: visible;
+        }
+
+        body.viewer-mode .printer-section {
+            left: 50vw;
+            top: 50vh;
+        }
+
+        .printer-layers {
+            position: relative;
+            width: 100%;
+            z-index: 20;
+        }
+
+        .printer-layers img {
+            width: 100%;
+            display: block;
+        }
+
+        .printer-base {
+            position: relative;
+            z-index: 21;
+        }
+
+
+        /* --- EYEBALL OVERLAY --- */
+        #eye-overlay {
+            position: fixed;
+            left: var(--printer-center-x);
+            top: var(--printer-center-y);
+            width: var(--printer-width);
+            transform: translate(-50%, -50%);
+            z-index: var(--eye-overlay-z-index);
+            pointer-events: none;
+        }
+
+        body.viewer-mode #eye-overlay {
+            left: 50vw;
+            top: 50vh;
+        }
+
+        .eye-overlay-size-guide {
+            width: 100%;
+            display: block;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .eye-whites {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: block;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .eye-blacks {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: block;
+            z-index: 2;
+            pointer-events: none;
+            transition: transform 0.1s ease-out;
+        }
+
+
+        /* --- INPUT MASK --- */
+        #input-mask {
+            position: absolute;
+            left: calc(var(--input-mask-left-x) + var(--input-mask-left-nudge));
+            top: var(--input-mask-top);
+            width: var(--input-mask-width);
+            height: var(--input-mask-height);
+            overflow: hidden;
+            z-index: var(--input-mask-z-index);
+            pointer-events: none;
+        }
+
+        /*
+            To see the mask while adjusting it, temporarily add this inside #input-mask:
+            outline: 2px solid red;
+        */
+
+
+        /* --- OUTPUT TRAY --- */
+        #output-tray {
+            position: absolute;
+            top: var(--output-appear-y);
+            left: var(--output-appear-x);
+            width: var(--output-tray-width);
+            height: var(--output-tray-height);
+            transform: translateX(-50%);
+            z-index: 35;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .receipt-wrapper {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: var(--receipt-width);
+            display: flex;
+            justify-content: center;
+            transform-origin: top center;
+            transform: translate(-50%, -112%) scale(var(--receipt-scale));
+            transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+            pointer-events: auto;
+        }
+
+
+        /* --- INPUT FORM / INPUT SLIP --- */
+        .form-section {
+            width: var(--input-width);
+            height: var(--input-height);
+            background-color: #fff;
+            padding: var(--input-padding-y) var(--input-padding-x);
+            border: 4px solid #000;
+            box-shadow: 12px 12px 0px rgba(0,0,0,0.1);
+            position: fixed;
+            left: var(--input-center-x);
+            top: var(--input-center-y);
+            transform: translate(-50%, -50%);
+            z-index: 100;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 40px 20px;
-            overflow-x: hidden;
-            position: relative;
+            justify-content: space-between;
+            gap: 7px;
+            transition: opacity 0.25s;
+            overflow: hidden;
         }
 
-        /* --- THE GENERATOR UI --- */
-        #generator-ui {
-            background-color: #f3ebd5; 
-            width: 100%;
-            max-width: 650px;
-            padding: 40px;
-            border: 3px solid #111;
-            box-shadow: 12px 12px 0px #000; 
-            z-index: 1000; 
-            position: relative;
-        }
-
-        /* Apply texture directly over the generator UI */
-        #generator-ui::after {
+        .form-section::after {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            inset: 0;
             background-image: url('papertexture.png');
             background-size: cover;
             background-position: center;
-            opacity: 0.65; 
-            mix-blend-mode: multiply; 
-            pointer-events: none; 
-            z-index: 9999; /* Forces it above all text/borders */
+            opacity: 0.8;
+            mix-blend-mode: multiply;
+            pointer-events: none;
+            z-index: 9999;
         }
 
-        /* Transparent Logo Setup */
-        .main-logo {
-            width: 100%;
-            max-width: 300px;
-            display: block;
-            margin: 0 auto 25px auto;
-            /* Removed the border-bottom here */
-            padding-bottom: 15px;
+        .typewriter-form {
+            font-size: var(--input-text-size);
+            line-height: 1.2;
+            font-weight: 900;
+            position: relative;
+            z-index: 10;
         }
-        
-        /* --- GUILT METER --- */
-        #guilt-container {
-            margin-bottom: 30px;
-            padding: 15px;
-            border: 2px dashed #111;
-            background-color: rgba(0,0,0,0.03);
-        }
-        .guilt-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; font-size: 1rem; }
-        .guilt-bar-bg { width: 100%; height: 20px; border: 2px solid #111; background-color: #fff; position: relative; }
-        #guilt-bar-fill { height: 100%; width: 0%; background-color: #d12020; transition: width 0.5s ease-out; }
-        #guilt-warning { color: #d12020; font-weight: bold; margin-top: 10px; text-align: center; min-height: 20px; font-size: 0.9rem; }
 
-        /* --- INPUT FORM --- */
-        .typewriter-form { font-size: 1.1rem; line-height: 2.2; margin-bottom: 40px; font-weight: bold; }
+        .name-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-top: 5px;
+            white-space: nowrap;
+        }
+
+        .name-row label {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            text-transform: uppercase;
+            font-size: var(--input-label-size);
+            font-weight: 900;
+        }
+
         input[type="text"] {
-            background-color: rgba(255,255,255,0.7);
-            border: 2px solid #111;
-            color: #111;
-            font-family: inherit;
-            font-size: 1.1rem;
+            background-color: transparent !important;
+            border: none;
+            border-bottom: 3px solid #000;
+            color: #000;
+            font-family: 'Caveat', cursive;
+            font-size: var(--input-name-size);
             font-weight: bold;
-            padding: 2px 10px;
-            width: 190px;
+            padding: 0px 4px;
+            width: var(--input-name-width);
             outline: none;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            transform: translateY(3px);
         }
-        input[type="text"]:focus { background-color: #00FF88; }
 
-        /* --- CUSTOM RETRO SLIDERS --- */
-        .sliders { display: flex; flex-direction: column; gap: 25px; margin-bottom: 40px; }
-        .slider-container { display: flex; flex-direction: column; gap: 8px; }
-        .slider-labels { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; }
-        
-        input[type="range"] { 
+        .sliders {
+            display: flex;
+            flex-direction: column;
+            gap: var(--input-slider-gap);
+            position: relative;
+            z-index: 10;
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--input-label-size);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .time-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: var(--input-label-size);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1;
+            position: relative;
+            z-index: 10;
+        }
+
+        .minutes-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        input[type="number"] {
+            background-color: #fff;
+            border: 3px solid #000;
+            color: #000;
+            font-family: inherit;
+            font-size: var(--input-minutes-size);
+            font-weight: 900;
+            width: var(--input-minutes-width);
+            height: 28px;
+            padding: 2px 6px;
+            outline: none;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
             -webkit-appearance: none;
-            width: 100%; 
+            margin: 0;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
             height: 8px;
-            background: #d3d3d3; 
-            border-radius: 10px;
+            background: #e5e5e5;
+            border: 2px solid #000;
             outline: none;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50px;
-            background: #f3ebd5;
-            border: 2px solid #ddd;
-            box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            width: 14px;
+            height: 17px;
+            background: #000;
             cursor: pointer;
         }
 
         button.primary-btn {
-            background-color: #111;
-            color: #f3ebd5;
-            border: none;
-            padding: 15px 35px;
+            background-color: #000;
+            color: #fff;
+            border: 2px solid #000;
+            padding: 7px 10px;
             font-family: inherit;
-            font-size: 1.4rem;
-            font-weight: bold;
+            font-size: var(--input-button-size);
+            line-height: 1;
+            font-weight: 900;
             cursor: pointer;
             text-transform: uppercase;
             width: 100%;
-        }
-        button.primary-btn:active { background-color: #00FF88; color: #111; }
-
-        /* --- MESSY TABLE OUTPUT TRAY --- */
-        #output-tray {
-            width: 100%;
-            max-width: 1000px; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 40px;
-        }
-
-        #receipt-stack {
-            width: 100%;
-            position: relative; 
-            min-height: 750px;  
-        }
-
-        .receipt-wrapper {
-            position: absolute;
-            top: 0;
-            left: 25%; 
-            width: 50%;
-            display: flex;
-            justify-content: center;
-        }
-
-        /* --- HORIZONTAL PASS ARCHITECTURE --- */
-        .receipt {
-            color: #111;
-            width: 650px; 
-            height: auto;
-            display: flex;
-            border: 3px solid #111;
-            box-shadow: 5px 5px 20px rgba(0,0,0,0.5); 
+            transition: all 0.2s;
             position: relative;
-            
-            transform: translateY(-200px) scale(0.8);
-            opacity: 0;
-            transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
+            z-index: 10;
         }
 
-        /* Apply texture directly over the printed receipt */
+        button.primary-btn:hover {
+            background-color: #fff;
+            color: #000;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        button.primary-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px #000;
+        }
+
+
+        /* --- SLIDING INPUT COPY INSIDE MASK --- */
+        .input-slide-copy {
+            position: absolute !important;
+            z-index: 1 !important;
+            pointer-events: none !important;
+            transform: translate(0, 0) !important;
+            transition: transform var(--input-slide-duration) linear !important;
+            will-change: transform;
+        }
+
+        .input-slide-copy.is-sliding {
+            transform: translateX(var(--slide-x)) !important;
+        }
+
+
+        /* --- RECEIPT DESIGN --- */
+        .receipt {
+            color: #000;
+            background-color: #fff;
+            width: 100%;
+            display: flex;
+            border: 4px solid #000;
+            position: relative;
+            box-shadow: 8px 8px 24px rgba(0,0,0,0.32);
+        }
+
         .receipt::after {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            inset: 0;
             background-image: url('papertexture.png');
             background-size: cover;
-            background-position: center;
-            opacity: 0.65; 
-            mix-blend-mode: multiply; 
-            pointer-events: none; 
-            z-index: 9999; 
-        }
-
-        .receipt.printing {
-            transform: translateY(0) scale(1); 
-            opacity: 1;
+            opacity: 0.8;
+            mix-blend-mode: multiply;
+            pointer-events: none;
+            z-index: 10;
         }
 
         .punch-hole-gutter {
-            width: 45px;
-            border-right: 3px solid #111;
+            width: 34px;
+            border-right: 4px solid #000;
             display: flex;
             flex-direction: column;
             justify-content: space-around;
             align-items: center;
-            padding: 15px 0;
-            background-color: rgba(0,0,0,0.08);
+            padding: 12px 0;
+            background-color: #e5e5e5;
         }
 
         .hole {
-            width: 14px;
-            height: 14px;
-            background-color: #111; 
-            border: 3px solid #111;
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            border: 3px solid #000;
             border-radius: 50%;
         }
 
@@ -214,245 +513,539 @@
             flex-direction: column;
         }
 
-        .ticket-header-block { display: flex; border-bottom: 3px solid #111; font-size: 0.85rem; font-weight: bold; }
-        .header-cell { padding: 10px 15px; border-right: 3px solid #111; }
-        .header-cell:last-child { border-right: none; }
+        .ticket-header-block {
+            display: flex;
+            border-bottom: 4px solid #000;
+            font-size: 0.72rem;
+            font-weight: 900;
+        }
+
+        .header-cell {
+            padding: 8px 10px;
+            border-right: 4px solid #000;
+        }
+
+        .header-cell:last-child {
+            border-right: none;
+        }
 
         .ticket-logo-bar {
-            padding: 15px;
-            background-color: rgba(0,0,0,0.04);
-            border-bottom: 3px solid #111;
+            padding: 10px 12px;
+            background-color: #000;
+            color: #fff;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-weight: 900;
+            text-transform: lowercase;
+            letter-spacing: 2px;
+            font-size: 1rem;
         }
-        
-        .receipt-logo-img { height: 35px; object-fit: contain; }
 
         .ticket-content-pane {
-            padding: 20px 15px;
+            padding: 16px 15px;
             font-size: 1rem;
-            line-height: 1.5;
+            line-height: 1.35;
             flex: 1;
-            border-bottom: 3px solid #111;
+            border-bottom: 4px solid #000;
+            background: #fff;
         }
-        
-        .metadata-label { font-size: 0.75rem; font-weight: bold; color: #333; text-transform: uppercase; margin-bottom: 5px; }
 
-        .ticket-footer-block { display: flex; background-color: rgba(0,0,0,0.05); font-size: 0.85rem; font-weight: bold; align-items: stretch; }
-        .footer-cell { padding: 12px 15px; border-right: 3px solid #111; display: flex; flex-direction: column; justify-content: center; }
-        .footer-cell:last-child { border-right: none; }
+        .metadata-label {
+            font-size: 0.64rem;
+            font-weight: 900;
+            color: #000;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
 
-        .cursive-branding {
-            font-family: 'Yellowtail', cursive;
-            color: #d12020;
-            font-size: 2rem;
-            line-height: 1;
+        .ticket-footer-block {
+            display: flex;
+            background-color: #f4f4f4;
+            font-size: 0.76rem;
+            font-weight: 900;
+            align-items: stretch;
+        }
+
+        .footer-cell {
+            padding: 9px 12px;
+            border-right: 4px solid #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .footer-cell:last-child {
+            border-right: none;
         }
 
         .ticket-barcode-strip {
-            height: 40px;
-            width: 140px;
-            background: repeating-linear-gradient(90deg, #111, #111 2px, transparent 2px, transparent 5px, #111 5px, #111 6px, transparent 6px, transparent 9px);
+            height: 30px;
+            width: 80px;
+            background: repeating-linear-gradient(
+                90deg,
+                #000,
+                #000 2px,
+                transparent 2px,
+                transparent 5px,
+                #000 5px,
+                #000 6px,
+                transparent 6px,
+                transparent 9px
+            );
         }
 
-        /* --- COPY LINK BUTTON --- */
         button.share-btn {
             background-color: transparent;
-            color: #111;
-            border: 2px solid #111;
-            padding: 8px 12px;
+            color: #000;
+            border: 3px solid #000;
+            padding: 6px 9px;
             font-family: inherit;
             font-weight: 900;
-            font-size: 0.85rem;
+            font-size: 0.72rem;
             cursor: pointer;
             text-transform: uppercase;
-            position: relative; 
-            z-index: 10000; /* Must sit above the texture layer to be clickable */
-            display: flex;
-            align-items: center;
-            /* Removed emoji */
+            position: relative;
+            z-index: 20;
         }
-        button.share-btn:active { background-color: #111; color: #fff; }
+
+        button.share-btn:hover {
+            background-color: #000;
+            color: #fff;
+        }
     </style>
 </head>
+
 <body>
 
-    <div id="generator-ui">
-        <img src="Artboard 1ooo.png" alt="Out of Obligation" class="main-logo">
-        
-        <div id="guilt-container">
-            <div class="guilt-header">
-                <span>CONSCIENCE LOAD:</span>
-                <span id="guilt-text">0%</span>
+    <a href="../index.html" class="back-btn">← go back</a>
+
+    <div class="app-container">
+
+        <!-- LEFT: PRINTER -->
+        <div class="printer-section">
+            <div id="input-mask"></div>
+
+            <div class="printer-layers">
+                <img src="printer.png" alt="l8 m8 printer" class="printer-base" id="printer-base">
             </div>
-            <div class="guilt-bar-bg">
-                <div id="guilt-bar-fill"></div>
-            </div>
-            <div id="guilt-warning"></div>
+
+            <div id="output-tray"></div>
         </div>
 
-        <div class="typewriter-form">
-            I, the undersigned, must formally request an exemption status from <input type="text" id="person-input" placeholder="e.g. dad" autocomplete="off">.<br><br>
-            I am physically/mentally unable to attend <input type="text" id="event-input" placeholder="e.g. his birthday" autocomplete="off">.
+
+        <!-- EYEBALLS: SEPARATE OVERLAY SO THEY SIT ABOVE THE INPUT SLIP -->
+        <div id="eye-overlay">
+            <img src="printer.png" alt="" class="eye-overlay-size-guide">
+            <img src="eyewhites.png" alt="" class="eye-whites">
+            <img src="eyeblacks.png" alt="" class="eye-blacks" id="pupils">
         </div>
 
-        <div class="sliders">
-            <div class="slider-container">
-                <div class="slider-labels"><span>Standard Logic</span><span>Complete Chaos</span></div>
-                <input type="range" id="realism-slider" class="styled-slider" min="1" max="10" value="5">
+
+        <!-- RIGHT: INPUT FORM -->
+        <div class="form-section" id="generator-ui">
+            <div class="typewriter-form">
+                Official declaration of tardiness.
+
+                <div class="name-row">
+                    <label>
+                        to
+                        <input type="text" id="person-input" placeholder="e.g. Boss" autocomplete="off">
+                    </label>
+
+                    <label>
+                        from
+                        <input type="text" id="from-input" placeholder="e.g. Me" autocomplete="off">
+                    </label>
+                </div>
             </div>
-            <div class="slider-container">
-                <div class="slider-labels"><span>Corporate</span><span>Casual</span></div>
-                <input type="range" id="formality-slider" class="styled-slider" min="1" max="10" value="5">
+
+            <div class="sliders">
+                <div class="time-row">
+                    <span>late by</span>
+
+                    <div class="minutes-control">
+                        <input type="number" id="mins-input" min="1" max="999" step="1" value="15" inputmode="numeric">
+                        <span>mins</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-labels">
+                        <span>Unapologetic</span>
+                        <span>Begging</span>
+                    </div>
+                    <input type="range" id="remorse-slider" min="1" max="100" value="50">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-labels">
+                        <span>Standard Logic</span>
+                        <span>Complete Chaos</span>
+                    </div>
+                    <input type="range" id="chaos-slider" min="1" max="100" value="50">
+                </div>
             </div>
+
+            <button id="generate-btn" class="primary-btn">Print Late Slip</button>
         </div>
 
-        <button id="generate-btn" class="primary-btn">Print Dispensation Pass</button>
     </div>
 
-    <div id="output-tray">
-        <div id="receipt-stack">
-            </div>
-    </div>
 
     <script>
-        // Custom Slider Fill Logic
+        // --- EYE TRACKING LOGIC ---
+        const pupils = document.getElementById('pupils');
+        const printerBase = document.getElementById('printer-base');
+        let eyeState = 'tracking';
+
+        document.addEventListener('mousemove', (e) => {
+            if (!pupils || !printerBase || eyeState !== 'tracking') return;
+
+            const rect = printerBase.getBoundingClientRect();
+            const printerCenterX = rect.left + rect.width / 2;
+            const printerCenterY = rect.top + rect.height / 2;
+
+            const deltaX = e.clientX - printerCenterX;
+            const deltaY = e.clientY - printerCenterY;
+
+            const maxRadius = printerBase.clientWidth * 0.012;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const dampening = 0.03;
+            const cappedDistance = Math.min(distance * dampening, maxRadius);
+
+            const angle = Math.atan2(deltaY, deltaX);
+            const moveX = Math.cos(angle) * cappedDistance;
+            const moveY = Math.sin(angle) * cappedDistance;
+
+            pupils.style.transform = `translate(${moveX}px, ${moveY}px)`;
+        });
+
+        function setEyes(direction) {
+            if (!printerBase || !pupils) return;
+
+            const maxRadius = printerBase.clientWidth * 0.012;
+
+            if (direction === 'down') {
+                pupils.style.transform = `translate(0px, ${maxRadius}px)`;
+            }
+
+            if (direction === 'right') {
+                pupils.style.transform = `translate(${maxRadius}px, 0px)`;
+            }
+        }
+
+
+        // --- SLIDER FILL LOGIC ---
         document.querySelectorAll('input[type="range"]').forEach(slider => {
             slider.addEventListener('input', (e) => {
                 const value = (e.target.value - e.target.min) / (e.target.max - e.target.min) * 100;
-                e.target.style.background = `linear-gradient(to right, #111 ${value}%, #d3d3d3 ${value}%)`;
+                e.target.style.background = `linear-gradient(to right, #000 ${value}%, #e5e5e5 ${value}%)`;
             });
+
             slider.dispatchEvent(new Event('input'));
         });
 
-        const dictionary = {
-            realisticFormal: {
-                intros: ["Please accept this as formal notification of my absence.", "I am writing to formally request to be excused.", "I will unfortunately be unable to attend this event."],
-                reasons: ["An urgent professional matter requires my immediate attention.", "A sudden family obligation has arisen that I must attend to.", "I am currently dealing with an unexpected health issue."],
-                outros: ["This renders my participation impossible.", "I hope you can understand my absence.", "I sincerely apologize for the inconvenience."]
-            },
-            realisticInformal: {
-                intros: ["I am so sorry, but I absolutely cannot make it.", "I'm going to have to bail on this one.", "I hate to do this, but I have to skip this event."],
-                reasons: ["I woke up feeling super sick and need to stay in bed.", "I completely double-booked myself today and am stuck.", "My car battery died and I am currently stranded."],
-                outros: ["Maybe we can catch up next time!", "Hope you all have fun without me.", "I'll definitely make it up to you later."]
-            },
-            absurdFormal: {
-                intros: ["It is with deep existential regret that I must withdraw my presence.", "I am legally and physically obligated to remain absent.", "Please be advised that my attendance is no longer a physical possibility."],
-                reasons: ["My residence has been commandeered by a sovereign nation of aggressive geese.", "A localized black hole has formed directly in my living room.", "I am currently undergoing an unexpected metamorphosis into a 19th-century grandfather clock."],
-                outros: ["This renders my departure physically impossible.", "Please forward my regards to the authorities.", "Do not attempt a rescue mission."]
-            },
-            absurdInformal: {
-                intros: ["You are not going to believe this, but I absolutely cannot make it.", "I am literally crying right now, but there is zero chance I can attend.", "I'm gonna keep it 100 with you, I'm completely trapped."],
-                reasons: ["My Roomba just formed a union and is currently holding me hostage.", "A stray pigeon stole my wallet and is actively trying to buy bread.", "I just got drafted into a secret war between the local squirrels and pigeons."],
-                outros: ["I am literally fighting for my life right now.", "Please don't ask any follow-up questions.", "Send help if you don't hear from me by tomorrow."]
+
+        // --- TEXT GENERATION ---
+        function pickRandom(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function generateLateNote(minutes, remorse, chaos) {
+            let intro = "";
+            let reason = "";
+            let outro = "";
+
+            if (remorse < 33) {
+                intro = pickRandom([
+                    "I'm running late.",
+                    "Not going to be there on time.",
+                    "Start without me."
+                ]);
+            } else if (remorse < 66) {
+                intro = pickRandom([
+                    "Hey, I'm going to be a bit late.",
+                    "Sorry, running behind!",
+                    "Apologies, I'm delayed."
+                ]);
+            } else {
+                intro = pickRandom([
+                    "I am so incredibly sorry, I'm running late.",
+                    "Please forgive me, I am horribly delayed.",
+                    "I am literally the worst, I am so sorry."
+                ]);
             }
-        };
 
-        const passColors = ['#f3ebd5', '#ff9ebb', '#a2d2ff', '#eef24f', '#fff5a5', '#e8c5ff'];
-        let colorIndex = 0;
+            if (chaos < 33) {
+                reason = pickRandom([
+                    "Traffic was much worse than expected.",
+                    "My alarm didn't go off.",
+                    "I completely lost track of time.",
+                    "I got held up at home."
+                ]);
+            } else if (chaos < 66) {
+                reason = pickRandom([
+                    "I spilled coffee all over myself on the way out.",
+                    "My cat refused to let me leave the house.",
+                    "I put my keys in the fridge and couldn't find them.",
+                    "I got into a staring contest with a squirrel."
+                ]);
+            } else {
+                reason = pickRandom([
+                    "A localized black hole formed directly in my living room.",
+                    "My Roomba formed a union and is currently holding me hostage.",
+                    "I was drafted into a secret war between the local pigeons.",
+                    "I am undergoing an unexpected metamorphosis into a 19th-century grandfather clock."
+                ]);
+            }
 
-        function pickRandom(array) { return array[Math.floor(Math.random() * array.length)]; }
-
-        function generateExcuse(realism, formality) {
-            let category = "realisticFormal";
-            if (realism <= 5 && formality > 5) category = "realisticInformal";
-            if (realism > 5 && formality <= 5) category = "absurdFormal";
-            if (realism > 5 && formality > 5) category = "absurdInformal";
-
-            let intro = pickRandom(dictionary[category].intros);
-            let reason = pickRandom(dictionary[category].reasons);
-            let outro = pickRandom(dictionary[category].outros);
+            if (remorse < 33) {
+                outro = pickRandom([
+                    `Expect me in ${minutes} minutes.`,
+                    `I'll be there in ${minutes} mins.`,
+                    `See you in ${minutes}.`
+                ]);
+            } else if (remorse < 66) {
+                outro = pickRandom([
+                    `See you in ${minutes} mins!`,
+                    `Should arrive in ${minutes} minutes.`,
+                    `I'll be there in exactly ${minutes} minutes.`
+                ]);
+            } else {
+                outro = pickRandom([
+                    `I will be ${minutes} minutes late, I am rushing!`,
+                    `I'll be ${minutes} minutes late. I owe you big time.`,
+                    `Please forgive the ${minutes} minute delay!`
+                ]);
+            }
 
             return `${intro} ${reason} ${outro}`;
         }
 
-        let receiptCount = 0;
-        let guiltLevel = 0;
-        const stackContainer = document.getElementById('receipt-stack');
 
-        function updateGuilt() {
-            if (guiltLevel < 100) guiltLevel += 20; 
-            document.getElementById('guilt-text').innerText = guiltLevel + '%';
-            document.getElementById('guilt-bar-fill').style.width = guiltLevel + '%';
+        // --- HELPERS ---
+        function escapeHTML(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
 
-            if (guiltLevel >= 100) {
-                document.getElementById('guilt-warning').innerText = "CRITICAL GUILT OVERLOAD. CHARACTER REPUTATION DESTROYED.";
-            } else if (guiltLevel >= 60) {
-                document.getElementById('guilt-warning').innerText = "Anxiety levels spiking.";
+        function syncFormValues(source, clone) {
+            const sourceFields = source.querySelectorAll('input, textarea, select');
+            const cloneFields = clone.querySelectorAll('input, textarea, select');
+
+            sourceFields.forEach((field, index) => {
+                const clonedField = cloneFields[index];
+                if (!clonedField) return;
+
+                if (field.type === 'checkbox' || field.type === 'radio') {
+                    clonedField.checked = field.checked;
+                } else {
+                    clonedField.value = field.value;
+                }
+
+                if (field.getAttribute('style')) {
+                    clonedField.setAttribute('style', field.getAttribute('style'));
+                }
+            });
+        }
+
+        function rootValue(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+
+        function rootNumber(name, fallback) {
+            const value = parseFloat(rootValue(name));
+            return Number.isFinite(value) ? value : fallback;
+        }
+
+        function cssTimeToMs(value, fallback) {
+            const clean = String(value).trim();
+
+            if (clean.endsWith('ms')) {
+                const ms = parseFloat(clean);
+                return Number.isFinite(ms) ? ms : fallback;
+            }
+
+            if (clean.endsWith('s')) {
+                const seconds = parseFloat(clean);
+                return Number.isFinite(seconds) ? seconds * 1000 : fallback;
+            }
+
+            const number = parseFloat(clean);
+            return Number.isFinite(number) ? number : fallback;
+        }
+
+        function cleanMinutes(value) {
+            const parsed = parseInt(value, 10);
+
+            if (!Number.isFinite(parsed) || parsed < 1) {
+                return 15;
+            }
+
+            return Math.min(parsed, 999);
+        }
+
+        async function copyTextToClipboard(text, button) {
+            try {
+                await navigator.clipboard.writeText(text);
+                button.innerText = 'COPIED';
+            } catch (error) {
+                window.prompt('Copy this link:', text);
             }
         }
 
-        function getConscienceDiagnosis(guilt) {
-            if (guilt <= 20) return "RELUCTANT AVOIDER";
-            if (guilt <= 40) return "CASUAL FLAKER";
-            if (guilt <= 60) return "COMMON LIAR";
-            if (guilt <= 80) return "HABITUAL FABRICATOR";
-            return "PATHOLOGICAL MENACE";
+
+        // --- PRINTING LOGIC ---
+        let receiptCount = 0;
+        let yOffset = 0;
+        let isPrinting = false;
+
+        const outputTray = document.getElementById('output-tray');
+        const inputMask = document.getElementById('input-mask');
+        const generatorUI = document.getElementById('generator-ui');
+
+        function triggerPrintSequence(payload) {
+            if (isPrinting) return;
+            isPrinting = true;
+
+            const rect = generatorUI.getBoundingClientRect();
+            const maskRect = inputMask.getBoundingClientRect();
+
+            const inputSlideTuck = rootNumber('--input-slide-tuck', 35);
+            const inputSlideMs = cssTimeToMs(rootValue('--input-slide-duration'), 1100);
+
+            const clone = generatorUI.cloneNode(true);
+            syncFormValues(generatorUI, clone);
+
+            clone.removeAttribute('id');
+            clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+            clone.querySelectorAll('input, button').forEach(el => {
+                el.tabIndex = -1;
+            });
+
+            clone.classList.add('input-slide-copy');
+
+            clone.style.left = (rect.left - maskRect.left) + 'px';
+            clone.style.top = (rect.top - maskRect.top) + 'px';
+            clone.style.width = rect.width + 'px';
+            clone.style.height = rect.height + 'px';
+            clone.style.right = 'auto';
+            clone.style.bottom = 'auto';
+            clone.style.margin = '0';
+
+            inputMask.appendChild(clone);
+            generatorUI.style.opacity = '0';
+
+            /*
+                The clone lives inside #input-mask.
+                The left edge of #input-mask is the printer mouth.
+                The slip slides left until its right edge is past that mouth.
+            */
+            const cloneStartLeftInsideMask = rect.left - maskRect.left;
+            const slideX = -cloneStartLeftInsideMask - rect.width - inputSlideTuck;
+
+            clone.style.setProperty('--slide-x', slideX + 'px');
+
+            requestAnimationFrame(() => {
+                eyeState = 'right';
+                setEyes('right');
+                clone.classList.add('is-sliding');
+            });
+
+            setTimeout(() => {
+                clone.remove();
+
+                eyeState = 'down';
+                setEyes('down');
+
+                printNewReceipt(payload, false);
+                generatorUI.style.opacity = '1';
+
+                setTimeout(() => {
+                    eyeState = 'tracking';
+                    isPrinting = false;
+                }, 1200);
+            }, inputSlideMs + 80);
         }
 
         function printNewReceipt(payload, isViewerMode) {
             receiptCount++;
-            
+
             const wrapper = document.createElement('div');
             wrapper.className = 'receipt-wrapper';
-            wrapper.style.zIndex = receiptCount; 
-            
+            wrapper.style.zIndex = receiptCount;
+
             const receipt = document.createElement('div');
-            receipt.className = 'receipt'; 
-            
-            receipt.style.backgroundColor = passColors[colorIndex % passColors.length];
-            colorIndex++;
+            receipt.className = 'receipt';
 
-            const serialNum = "00" + Math.floor(Math.random() * 89999 + 10000); 
+            const serialNum = "00" + Math.floor(Math.random() * 89999 + 10000);
 
-            let actionCell = `<div class="cursive-branding">Thank You!</div>`;
+            let shareUrl = "";
+            let actionCell = `<strong>VALIDATED</strong>`;
+
             if (!isViewerMode) {
                 const encodedData = btoa(encodeURIComponent(JSON.stringify(payload)));
-                const shareUrl = `${window.location.origin}${window.location.pathname}?subpoena=${encodedData}`;
-                // Removed the emoji from the button text here
-                actionCell = `<button class="share-btn" onclick="navigator.clipboard.writeText('${shareUrl}'); this.innerText='COPIED!';">COPY LINK</button>`;
+                shareUrl = `${window.location.origin}${window.location.pathname}?subpoena=${encodedData}`;
+                actionCell = `<button class="share-btn" type="button">COPY LINK</button>`;
             }
-            
-            let html = `
+
+            const safePerson = escapeHTML(payload.person || "Recipient");
+            const safeFrom = escapeHTML(payload.from || "Anonymous");
+            const safeTimestamp = escapeHTML(payload.timestamp);
+            const safeExcuse = escapeHTML(payload.excuse);
+            const safeMinutes = escapeHTML(payload.minutes);
+
+            const html = `
                 <div class="punch-hole-gutter">
                     <div class="hole"></div>
                     <div class="hole"></div>
                     <div class="hole"></div>
                     <div class="hole"></div>
                 </div>
-                
+
                 <div class="ticket-main">
                     <div class="ticket-header-block">
                         <div class="header-cell" style="flex: 1;">
-                            <div class="metadata-label">TO STATUS:</div>
-                            <strong style="text-transform: uppercase; font-size: 1.1rem;">${payload.person}</strong>
+                            <div class="metadata-label">DELIVER TO:</div>
+                            <strong style="text-transform: uppercase;">${safePerson}</strong>
                         </div>
-                        <div class="header-cell" style="width: 180px;">
-                            <div class="metadata-label">VALID TIMESTAMP:</div>
-                            <strong>${payload.timestamp}</strong>
+
+                        <div class="header-cell" style="width: 110px;">
+                            <div class="metadata-label">FROM:</div>
+                            <strong style="text-transform: uppercase;">${safeFrom}</strong>
+                        </div>
+
+                        <div class="header-cell" style="width: 115px;">
+                            <div class="metadata-label">TIMESTAMP:</div>
+                            <strong>${safeTimestamp}</strong>
                         </div>
                     </div>
-                    
+
                     <div class="ticket-logo-bar">
-                        <img src="Artboard 1ooo.png" alt="Out of Obligation" class="receipt-logo-img">
-                        <span style="color:#d12020; font-size:1.2rem; font-weight:900;">${serialNum}</span>
+                        <span>l8 m8 - late note</span>
+                        <span>#${serialNum}</span>
                     </div>
-                    
+
                     <div class="ticket-content-pane">
-                        <div class="metadata-label" style="margin-bottom: 10px;">OBLIGATION TO VOID: <span style="color:#d12020; text-transform:uppercase;">${payload.event}</span></div>
-                        <strong style="font-size: 1.1rem;">${payload.excuse}</strong>
+                        <strong>${safeExcuse}</strong>
                     </div>
-                    
+
                     <div class="ticket-footer-block">
                         <div class="footer-cell" style="flex: 1;">
-                            <div class="metadata-label">CONSCIENCE DIAGNOSIS:</div>
-                            <span style="color:#d12020; font-weight:900; font-size:1rem;">${payload.conscience}</span>
+                            <div class="metadata-label">ESTIMATED DELAY:</div>
+                            <span style="font-weight:900; font-size:1rem; color:#000;">${safeMinutes} MINS</span>
                         </div>
-                        <div class="footer-cell" style="width: 160px; align-items:center;">
+
+                        <div class="footer-cell" style="width: 96px; align-items:center;">
                             <div class="ticket-barcode-strip"></div>
                         </div>
-                        <div class="footer-cell" style="padding-right: 15px;">
+
+                        <div class="footer-cell" style="padding-right: 12px; align-items:center;">
                             ${actionCell}
                         </div>
                     </div>
@@ -461,55 +1054,74 @@
 
             receipt.innerHTML = html;
             wrapper.appendChild(receipt);
-            stackContainer.appendChild(wrapper);
-            
-            void receipt.offsetWidth;
-            receipt.classList.add('printing');
+            outputTray.appendChild(wrapper);
+
+            const shareButton = receipt.querySelector('.share-btn');
+            if (shareButton) {
+                shareButton.addEventListener('click', () => {
+                    copyTextToClipboard(shareUrl, shareButton);
+                });
+            }
+
+            void wrapper.offsetWidth;
+
+            const stackGap = rootNumber('--receipt-stack-gap', 9);
+            const randomAngle = (Math.random() * 2) - 1;
+            const randomX = (Math.random() * 8) - 4;
+            const xCalc = randomX >= 0
+                ? `calc(-50% + ${randomX}px)`
+                : `calc(-50% - ${Math.abs(randomX)}px)`;
 
             setTimeout(() => {
-                const randomAngle = (Math.random() * 40) - 20; 
-                const randomX = (Math.random() * 320) - 160;   
-                const randomY = (Math.random() * 180) - 40;    
-                
-                wrapper.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomAngle}deg)`;
-            }, 50); 
+                wrapper.style.transform = `translate(${xCalc}, calc(var(--output-drop-distance) + ${yOffset}px)) scale(var(--receipt-scale)) rotate(${randomAngle}deg)`;
+                yOffset = Math.min(yOffset + stackGap, 34);
+            }, 50);
         }
 
+
+        // --- SHARE LINK VIEWER MODE ---
         const urlParams = new URLSearchParams(window.location.search);
         const subpoenaData = urlParams.get('subpoena');
 
         if (subpoenaData) {
+            document.body.classList.add('viewer-mode');
             document.getElementById('generator-ui').style.display = 'none';
+
             try {
                 const payload = JSON.parse(decodeURIComponent(atob(subpoenaData)));
-                printNewReceipt(payload, true);
+
+                setTimeout(() => {
+                    eyeState = 'down';
+                    setEyes('down');
+                    printNewReceipt(payload, true);
+                }, 500);
             } catch (e) {
                 alert("Corrupted data payload.");
             }
         } else {
             document.getElementById('generate-btn').addEventListener('click', () => {
                 const person = document.getElementById('person-input').value || "Recipient";
-                const event = document.getElementById('event-input').value || "Obligation";
-                const realism = parseInt(document.getElementById('realism-slider').value);
-                const formality = parseInt(document.getElementById('formality-slider').value);
-                
+                const from = document.getElementById('from-input').value || "Anonymous";
+                const mins = cleanMinutes(document.getElementById('mins-input').value);
+                const remorse = parseInt(document.getElementById('remorse-slider').value);
+                const chaos = parseInt(document.getElementById('chaos-slider').value);
+
+                document.getElementById('mins-input').value = mins;
+
                 const now = new Date();
-                const timeString = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}/${now.getFullYear().toString().substring(2)}`;
+                const timeString = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear().toString().substring(2)}`;
 
-                const generatedText = generateExcuse(realism, formality);
-                
-                updateGuilt(); 
-                const currentDiagnosis = getConscienceDiagnosis(guiltLevel);
+                const generatedText = generateLateNote(mins, remorse, chaos);
 
-                const payload = { 
-                    person: person, 
-                    event: event, 
-                    excuse: generatedText, 
-                    timestamp: timeString,
-                    conscience: currentDiagnosis
+                const payload = {
+                    person: person,
+                    from: from,
+                    minutes: mins,
+                    excuse: generatedText,
+                    timestamp: timeString
                 };
 
-                printNewReceipt(payload, false);
+                triggerPrintSequence(payload);
             });
         }
     </script>
