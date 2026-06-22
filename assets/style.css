@@ -80,7 +80,7 @@ body {
   bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
-  width: 520px; /* Widened slightly to accommodate the 10th item */
+  width: 580px; /* Widened slightly to accommodate the 11th item */
   display: flex;
   flex-wrap: wrap-reverse;
   justify-content: center;
@@ -114,7 +114,8 @@ body {
 .icon-item:nth-child(7) { animation-delay: 0.3s; }
 .icon-item:nth-child(8) { animation-delay: 0.7s; } 
 .icon-item:nth-child(9) { animation-delay: 0.45s; } 
-.icon-item:nth-child(10) { animation-delay: 0.25s; } /* The new 💌 */
+.icon-item:nth-child(10) { animation-delay: 0.25s; }
+.icon-item:nth-child(11) { animation-delay: 0.55s; } /* The new 🐛 */
 
 .icon-item:hover {
   z-index: 50; 
@@ -136,7 +137,8 @@ body {
 .icon-item:nth-child(7) .emoji { transform: rotate(-12deg); }
 .icon-item:nth-child(8) .emoji { transform: rotate(15deg); } 
 .icon-item:nth-child(9) .emoji { transform: rotate(-20deg); } 
-.icon-item:nth-child(10) .emoji { transform: rotate(8deg); } /* The new 💌 */
+.icon-item:nth-child(10) .emoji { transform: rotate(8deg); } 
+.icon-item:nth-child(11) .emoji { transform: rotate(-14deg); } /* The new 🐛 */
 
 .icon-item:hover .emoji {
   transform: scale(1.15) translateY(-20px) rotate(0deg) !important; 
