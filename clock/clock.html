@@ -59,77 +59,6 @@
       color: #ffffff;
       text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
       font-variant-numeric: tabular-nums;
-      margin-bottom: 12px;
-    }
-
-    /* --- MINIMALIST MONOTONE ANALOG CLOCK --- */
-    .analog-clock {
-      position: relative;
-      width: 120px; 
-      height: 120px;
-      border-radius: 50%;
-      border: 2px solid #e0e0e0; 
-      background: #fdfdfd;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4); 
-      cursor: grab;
-      touch-action: none; 
-      pointer-events: auto; 
-    }
-    
-    .analog-clock:active {
-      cursor: grabbing;
-    }
-
-    .clock-mark {
-      position: absolute;
-      width: 2px;
-      height: 6px;
-      background: #ccc;
-      top: 4px;
-      left: 50%;
-      margin-left: -1px;
-      transform-origin: 50% 56px; 
-    }
-
-    .clock-mark:nth-child(3n) {
-      background: #888;
-      height: 10px;
-    }
-
-    .hand {
-      position: absolute;
-      bottom: 50%;
-      left: 50%;
-      transform-origin: bottom center;
-      border-radius: 4px;
-    }
-
-    .hour-hand {
-      width: 4px;
-      height: 30px;
-      background: #555; 
-      margin-left: -2px;
-      z-index: 3;
-    }
-
-    .minute-hand {
-      width: 2px;
-      height: 45px;
-      background: #222; 
-      margin-left: -1px;
-      z-index: 4;
-    }
-
-    .center-dot {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 10px;
-      height: 10px;
-      background: #222;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 5;
     }
   </style>
 </head>
@@ -141,11 +70,6 @@
 
   <div class="controls-container">
     <div class="time-display" id="timeDisplay">12 : 00</div>
-    <div class="analog-clock" id="analogClock">
-      <div class="hand hour-hand" id="hourHand"></div>
-      <div class="hand minute-hand" id="minuteHand"></div>
-      <div class="center-dot"></div>
-    </div>
   </div>
 
   <script>
@@ -162,17 +86,6 @@
     const appleSize = 550; 
 
     const timeDisplay = document.getElementById('timeDisplay');
-    const analogClock = document.getElementById('analogClock');
-    const hourHand = document.getElementById('hourHand');
-    const minuteHand = document.getElementById('minuteHand');
-
-    // --- DRAW CLOCK MARKS ---
-    for (let i = 0; i < 12; i++) {
-        const mark = document.createElement('div');
-        mark.classList.add('clock-mark');
-        mark.style.transform = `rotate(${i * 30}deg)`;
-        analogClock.appendChild(mark);
-    }
 
     // --- STRICT SWARM LOGIC ---
     const rawBites = [];
@@ -225,76 +138,17 @@
         
         img.onload = () => {
             imagesLoaded++;
-            if (imagesLoaded === totalImages) renderCanvas();
+            // Initial render once all images are ready
+            if (imagesLoaded === totalImages) updateTime();
         };
         
         img.onerror = () => console.error(`Failed to load apple${indexStr}.png`);
         appleImages.push(img);
     }
 
-    // --- ANALOG DRAG LOGIC & STATE (INITIALIZED TO CURRENT TIME) ---
-    const now = new Date();
-    let totalMinutes = now.getHours() * 60 + now.getMinutes(); 
-    let prevHour = Math.floor(totalMinutes / 60);
-    
-    let isDragging = false;
-    let prevAngle = 0;
-
-    function getAngle(e) {
-        const rect = analogClock.getBoundingClientRect();
-        const clockX = rect.left + rect.width / 2;
-        const clockY = rect.top + rect.height / 2;
-        
-        let clientX = e.clientX;
-        let clientY = e.clientY;
-        
-        if (e.touches && e.touches.length > 0) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-        }
-        
-        let angle = Math.atan2(clientY - clockY, clientX - clockX) * 180 / Math.PI;
-        angle += 90; 
-        if (angle < 0) angle += 360;
-        return angle;
-    }
-
-    function startDrag(e) {
-        if (e.cancelable) e.preventDefault();
-        isDragging = true;
-        prevAngle = getAngle(e);
-        handleDrag(e); 
-    }
-
-    function endDrag() {
-        isDragging = false;
-    }
-
-    function handleDrag(e) {
-        if (!isDragging) return;
-        if (e.cancelable) e.preventDefault();
-
-        const currentAngle = getAngle(e);
-        let deltaAngle = currentAngle - prevAngle;
-
-        if (deltaAngle > 180) deltaAngle -= 360;
-        else if (deltaAngle < -180) deltaAngle += 360;
-
-        totalMinutes += deltaAngle / 6;
-
-        if (totalMinutes < 0) totalMinutes += 1440;
-        if (totalMinutes >= 1440) totalMinutes -= 1440;
-
-        prevAngle = currentAngle;
-        updateTime();
-    }
-
-    analogClock.addEventListener('mousedown', startDrag);
-    analogClock.addEventListener('touchstart', startDrag, { passive: false });
-    window.addEventListener('mousemove', handleDrag);
-    window.addEventListener('touchmove', handleDrag, { passive: false });
-    window.addEventListener('mouseup', endDrag);
-    window.addEventListener('touchend', endDrag);
+    // --- TIME TRACKING STATE ---
+    let prevHour = new Date().getHours();
+    let initialLoad = true;
 
     // --- DROP ANIMATION ---
     function startDropAnimation() {
@@ -305,32 +159,32 @@
         canvas.style.transform = 'scale(1)';
     }
 
+    // --- AUTOMATIC TIME UPDATE ---
     function updateTime() {
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = Math.floor(totalMinutes % 60);
+        if (imagesLoaded < totalImages) return;
 
-        minuteHand.style.transform = `rotate(${minutes * 6}deg)`;
-        hourHand.style.transform = `rotate(${(hours % 12) * 30 + minutes * 0.5}deg)`;
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const totalMinutes = hours * 60 + minutes;
 
+        // Update digital display
         timeDisplay.textContent = `${String(hours).padStart(2, '0')} : ${String(minutes).padStart(2, '0')}`;
 
-        // Only trigger drop animation if we've crossed an hour boundary 
-        // AND the user is actually interacting (prevents drop on first page load)
-        if (hours !== prevHour && isDragging) {
-            startDropAnimation();
+        // Trigger drop animation on the hour mark (skip on initial page load)
+        if (hours !== prevHour) {
+            if (!initialLoad) {
+                startDropAnimation();
+            }
             prevHour = hours;
-        } else if (hours !== prevHour) {
-            // Silently update the hour reference on initial load
-            prevHour = hours; 
         }
-
-        renderCanvas();
+        
+        initialLoad = false;
+        renderCanvas(totalMinutes);
     }
 
     // --- ADVANCED RENDERING WITH DYNAMIC SHADOW ---
-    function renderCanvas() {
-        if (imagesLoaded < totalImages) return;
-
+    function renderCanvas(totalMinutes) {
         const hours = Math.floor(totalMinutes / 60);
         const minutes = Math.floor(totalMinutes % 60);
         const currentHourImageIndex = hours % 12;
@@ -367,8 +221,12 @@
         ctx.restore(); 
     }
 
-    // Trigger initial UI update based on current time
+    // Start the clock loop (checks the time every 1000 milliseconds / 1 second)
+    setInterval(updateTime, 1000);
+    
+    // Call once immediately to set the initial state (will render once images load)
     updateTime();
+
   </script>
 </body>
 </html>
